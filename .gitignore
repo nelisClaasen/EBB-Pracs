@@ -1,0 +1,64 @@
+# Core LaTeX auxiliary files
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+
+# Intermediate documents
+*.dvi
+*.xdv
+*-converted-to.*
+
+# Bibliography auxiliary files (BibTeX / Biber)
+*.bbl
+*.bcf
+*.blg
+*-blx.aux
+*-blx.bib
+*.run.xml
+
+# Index and glossary files
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.glsdefs
+*.idx
+*.ilg
+*.ind
+*.ist
+
+# SyncTeX (used by editors for forward/inverse search)
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+*.synctex.gz(busy)
+
+# pdfLaTeX and latexmk specific files
+*.fdb_latexmk
+*.pdfsync
+
+# OS and Editor generated files
+.DS_Store
+*.swp
+*.bak
+*.sav
+.vscode/
+.texpadtmp/
+
+# ---------------------------------------------------
+# Output file (Optional)
+# ---------------------------------------------------
+# Uncomment the line below if you do NOT want to track 
+# the generated PDFs in your repository.
+# *.pdf
