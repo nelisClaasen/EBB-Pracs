@@ -10,34 +10,44 @@ double I = 0;
 double D = 0;
 double setpoint = 0;
 double disturbance = 0;
-double duty = 50; //50% duty cycle by default.
-int PWM_Flag = 0; //By default only pwm1 is on. 
+double duty = 128; //50% duty cycle by default.
+int control_outputs = 0; //By default only pwm1 is on. 
 bool start = 0; //Start off.   
+int message = 100; //Flags for certain messages.
+int start_time = 0;
 
-int timer = 0;
-const int PWM1 = GPIO_NUM_32;
-const int PWM2 = GPIO_NUM_33;
-const int Meas1 = GPIO_NUM_34;
-const int Meas2 = GPIO_NUM_35;
+hw_timer_t *timer = NULL;
+const int PWM_Out_1 = GPIO_NUM_32;
+const int PWM_Out_2 = GPIO_NUM_25;
+const int PWM_Meas_1 = GPIO_NUM_33;
+const int PWM_Meas_2 = GPIO_NUM_26;
+
+const int Temp_Meas1 = GPIO_NUM_34;
+const int Temp_Meas2 = GPIO_NUM_35;
 
 const double A = 3.3/4095.0;
 const int PWM_freq = 10;
 const int PWM_res = 8;
 
 const int BaudRate = 115200;
-const int sampling_period = 5;
+const int sampling_period = 10000; //In microseconds.
 
 void setup() {
   //Start the USB-C serial/UART port.
   Serial.begin(BaudRate);
 
   //Setup I/O pins.
-  pinMode(Meas1, INPUT);
-  pinMode(Meas2, INPUT);
+  pinMode(Temp_Meas1, INPUT);
+  pinMode(Temp_Meas2, INPUT);
+  pinMode(PWM_Meas_1, INPUT);
+  pinMode(PWM_Meas_2, INPUT);
 
   ledcChangeFrequency(0, PWM_freq, PWM_res);
-  ledcAttachPin (PWM1, 0);
-  ledcAttachPin(PWM2, 1);
+  ledcChangeFrequency(1, PWM_freq, PWM_res);
+  ledcAttachPin (PWM_Out_1, 0);
+  ledcAttachPin(PWM_Out_2, 1);
+
+  timer = timerBegin(0, 80, true);
 }
 
 void loop() {
@@ -49,52 +59,111 @@ void loop() {
     received.trim();
 
     std::istringstream stream(received.c_str());
-    std::string temp;
+    std::string command;
+    std::string value_str;
+    double value;
 
-    std::getline(stream, temp, ',');
-    P = std::stod(temp);
+    std::getline(stream, command, ',');
+    std::getline(stream, value_str, ',');
+    value = std::stod(value_str);
 
-    std::getline(stream, temp, ',');
-    I = std::stod(temp);
-    
-    std::getline(stream, temp, ',');
-    D = std::stod(temp);
+    if(command == "0")
+    {
+      P = value;
+    }
+    else if(command == "1")
+    {
+      I = value;
+    }
+    else if(command == "2")
+    {
+      D = value;
+    }
+    else if(command == "3")
+    {
+      setpoint = value;
+    }
+    else if(command == "4")
+    {
+      disturbance = value;
+    }
+    else if(command == "5")
+    {
+      duty = value;
+      duty = (pow(2, PWM_res) - 1)*(duty/100.0); //Convert to percentage.
+    }
+    else if(command == "6")
+    {
+      control_outputs = value;
+      //Serial.print("Igot");
+      //Serial.println(control_outputs);
+    }
+    else if(command == "7")
+    {
+      start = value;
 
-    std::getline(stream, temp, ',');
-    setpoint = std::stod(temp);
-    
-    std::getline(stream, temp, ',');
-    disturbance = std::stod(temp);
-    
-    std::getline(stream, temp, ',');
-    duty = std::stod(temp);
-    duty = pow(2, PWM_res)*(duty/100.0);
-    
-    std::getline(stream, temp, ',');
-    PWM_Flag = std::stod(temp);
-    
-    std::getline(stream, temp, ',');
-    start = std::stod(temp);
-
-    timer = millis();
+      //Check if start is true, then start timer.
+      if(start)
+      {
+        start_time = millis();
+      }
+    }
   }
 
   //If start flag is true, start measuring inputs/start controlling aswell.
   if(start)
   {
-    int start_time = millis();
-    double elapsed = sampling_period - (millis() - start_time);
+    //Check when we started in order to see how long we were busy.
+    timerRestart(timer);
 
-    std::string sending = fmt::format("{0},{1},{2},{3}", analogRead(Meas1)*A, analogRead(Meas2)*A, millis() - timer, static_cast<int>(elapsed <= 0)); 
+    //Turn on the appropriate PWM signals.
+    switch(control_outputs)
+    {
+      case 0:
+        ledcWrite(0, duty);
+        ledcWrite(1, 0);
+        break;
+
+      case 1:
+        ledcWrite(1, duty);
+        ledcWrite(0, 0);
+        break;
+
+      case 2:
+        ledcWrite(0, duty);
+        ledcWrite(1, duty);
+        break;
+
+        default:
+        ledcWrite(0, 0);
+        ledcWrite(1, 0);
+    }
+
+    //Send sensor input data as a comma seperated list.
+    std::string sending = fmt::format("{0}, {1}, {2}, {3}, {4}, {5}",
+    analogRead(Temp_Meas1)*A, analogRead(Temp_Meas2)*A, analogRead(PWM_Meas_1)*A, analogRead(PWM_Meas_2)*A, millis() - start_time, message);
+
     Serial.println(String(sending.c_str()));
+    Serial.flush();
 
-    ledcWrite(0, duty);
+    //Check how long everything took in microseconds.
+    int elapsed = timerReadMicros(timer);
 
-    elapsed >= 0 ? delay(elapsed) : delay(sampling_period);
+    if(elapsed <= sampling_period)
+    {
+      delayMicroseconds(sampling_period - elapsed);
+      message = 100; //Reset message flag to show nothing.
+    }
+    else
+    {
+      delayMicroseconds(sampling_period);
+      message = 0; //Set message flag for sampling too fast.
+    }
   }
   //Otherwise deactivate PWM outputs.
   else
   {
-
+    ledcWrite(0, 0);
+    ledcWrite(1, 0);
   }
 }
