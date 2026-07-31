@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <queue>
 
 double P = 0;
 double I = 0;
@@ -16,13 +17,19 @@ bool start = 0; //Start off.
 int message = 100; //Flags for certain messages.
 int start_time = 0;
 
+double temp1 = 0;
+double temp2 = 0;
+int N_samples = 200;
+std::queue<double> samples1;
+std::queue<double> samples2;
+
 hw_timer_t *timer = NULL;
 const int PWM_Out_1 = GPIO_NUM_32;
 const int PWM_Out_2 = GPIO_NUM_25;
 const int PWM_Meas_1 = GPIO_NUM_33;
 const int PWM_Meas_2 = GPIO_NUM_26;
 
-const int Temp_Meas1 = GPIO_NUM_34;
+const int Temp_Meas1 = GPIO_NUM_27;
 const int Temp_Meas2 = GPIO_NUM_35;
 
 const double A = 3.3/4095.0;
@@ -48,6 +55,9 @@ void setup() {
   ledcAttachPin(PWM_Out_2, 1);
 
   timer = timerBegin(0, 80, true);
+
+  samples1.push(0);
+  samples2.push(0);
 }
 
 void loop() {
@@ -139,9 +149,28 @@ void loop() {
         ledcWrite(1, 0);
     }
 
+    //Interpret sensor data.
+    double temp1_raw = (analogRead(Temp_Meas1)*A - 0.5)/0.01;
+    double temp2_raw = (analogRead(Temp_Meas2)*A - 0.5)/0.01;
+
+    if(samples1.size() > N_samples)
+    {
+      temp1 -= samples1.front();
+      temp2 -= samples2.front();
+
+      samples1.pop();
+      samples2.pop();
+    }
+
+    temp1 += temp1_raw/N_samples;
+    temp2 += temp2_raw/N_samples;
+
+    samples1.push(temp1_raw/N_samples);
+    samples2.push(temp2_raw/N_samples);
+
     //Send sensor input data as a comma seperated list.
     std::string sending = fmt::format("{0}, {1}, {2}, {3}, {4}, {5}",
-    analogRead(Temp_Meas1)*A, analogRead(Temp_Meas2)*A, analogRead(PWM_Meas_1)*A, analogRead(PWM_Meas_2)*A, millis() - start_time, message);
+    temp1, temp2, analogRead(PWM_Meas_1)*A, analogRead(PWM_Meas_2)*A, millis() - start_time, message);
 
     Serial.println(String(sending.c_str()));
     Serial.flush();
