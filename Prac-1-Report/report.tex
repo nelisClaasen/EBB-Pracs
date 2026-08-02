@@ -1,0 +1,89 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                              Document Settings                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,12pt]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                   Margins                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The 'geometry' package replaces manual margin adjustments.
+% 'a4paper' sets the paper size, and 'margin' sets uniform spacing.
+% 'top' and 'bottom' are adjusted here to give more vertical space.
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=3cm, right=3cm]{geometry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                   Packages                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   Equation and Unit Formatting
+\usepackage{amsmath}                % Essential for math formulas and symbol
+\usepackage{amsfonts}               % Provides additional mathematical fonts
+\usepackage{siunitx}                % The gold standard for units and scientific notation (e.g., 10 \degree C)
+\usepackage{subcaption}             % Allows side-by-side figures with sub-labels
+
+%   Figure and Table Formatting
+\usepackage[pdftex]{graphicx}       % Allows the inclusion of images (PNG, JPG, PDF)
+\usepackage{float}                  % Improves placement of 'floats' like images/tables
+\usepackage{booktabs}               % For professional, "cleaner" looking tables (rules like \toprule)
+\usepackage{array}                  % Provides more flexibility for table column alignment
+\graphicspath{/Images}				% Specify a default path for images
+
+%   Referencing, Citations, and Indexing
+\usepackage[style=ieee]{biblatex}   % Manages citations and bibliography using IEEE style
+\usepackage[hidelinks]{hyperref}    % Adds clickable links to the TOC and citations
+\usepackage{cleveref}               % Smarter cross-referencing: automatically writes "Figure 1" or "Table 2"
+\usepackage{imakeidx}               % Enables the creation of an index section
+\makeindex
+\addbibresource{references.bib}		% Specify path for references.bib
+
+%   Inserting Code Blocks
+\usepackage{listings}               % Formats and includes raw source code into the doc
+\lstset{breaklines = true}			% Makes code wrap around when put into pdf
+\usepackage{matlab-prettifier}		% Insert Matlab Code
+
+
+%   Other Quality of Life Changes   %
+\usepackage[T1]{fontenc}            % Handles font encoding for special characters
+\usepackage{parskip}                % Replaces paragraph indents with vertical spacing
+\usepackage{microtype}              % Subtly improves typography and prevents awkward line breaks
+\usepackage{xcolor}                 % Allows for colored text, useful for code or highlighting
+\def\thesection{\arabic{section}}	% Sets numbering for sections to arabic numerals
+%\usepackage{lettrine}              % Used for dropped capital letters at starts of sections
+%\usepackage{fancyhdr}              % Custom headers and footers for that professional "University" look
+
+% For pseudo-code
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{forest}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                   Document                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+	
+	% Title page
+	\include{Content/title_page.tex}
+
+	% Table of Contents
+	\tableofcontents
+
+	\include{Content/intro}
+	\include{Content/theoreticalBackground}
+	\include{Content/method}
+	\include{Content/results}
+	\include{Content/discussion}
+	\include{Content/conclusion}
+
+	\printbibliography
+	\include{Content/appendices.tex}
+
+	% Appendix for tables and figures, might not always be necessary
+	\begin{appendix}
+		\listoftables
+		\listoffigures
+	\end{appendix}
+
+\end{document}

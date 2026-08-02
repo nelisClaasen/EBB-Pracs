@@ -1,0 +1,21 @@
+# Output directory for auxiliary files
+$out_dir = "build";
+ensure_path($out_dir);
+
+# PDF generation mode
+$pdf_mode = 1;
+
+# Copy PDF to root directory after successful compilation
+END {
+    my $source = "$out_dir/$report.pdf";
+    my $dest = "./$report.pdf";
+    if (-e $source) {
+        copy($source, $dest) or warn "Copy failed: $!";
+    }
+}
+
+# Cleanup rules
+$clean_full_ext = "%R.synctex.gz %R.bbl %R.fls %R.run.xml %R.fdb_latexmk";
+
+# Set output directory for all files
+push @default_files, $out_dir;
