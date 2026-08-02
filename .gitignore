@@ -62,3 +62,38 @@
 # Uncomment the line below if you do NOT want to track 
 # the generated PDFs in your repository.
 # *.pdf
+
+# MATLAB Autosaves and Backups
+*.asv
+*.m~
+*~
+
+# Simulink Cache Files (These update every time you simulate)
+*.slxc
+
+# Simulink Build and Project Folders (Auto-generated)
+slprj/
+
+# Code Generation Folders (If you use Simulink Coder)
+codegen/
+*_ert_rtw/
+*_grt_rtw/
+*_target_rtw/
+
+# Compiled MEX Files
+*.mex*
+*.mexa64
+*.mexmaci64
+*.mexw64
+
+# MATLAB Live Script Caches
+*.mlxc
+
+# MATLAB Data Files 
+# (Uncomment the line below if you want to ignore all .mat workspace files. 
+# Keep it commented if you want to track your recorded lab data!)
+# *.mat
+
+# OS-Specific Hidden Files
+.DS_Store
+Thumbs.db
