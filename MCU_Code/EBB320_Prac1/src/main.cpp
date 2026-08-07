@@ -32,12 +32,12 @@ const int PWM_Meas_2 = GPIO_NUM_26;
 const int Temp_Meas1 = GPIO_NUM_27;
 const int Temp_Meas2 = GPIO_NUM_35;
 
-const double A = 3.3/4095.0;
+const double A = (3.3/4095.0);
 const int PWM_freq = 10;
 const int PWM_res = 8;
 
-const int BaudRate = 115200;
-const int sampling_period = 10000; //In microseconds.
+const int BaudRate = 1152000;
+const int sampling_period = 5000; //In microseconds.
 
 void setup() {
   //Start the USB-C serial/UART port.
@@ -150,8 +150,8 @@ void loop() {
     }
 
     //Interpret sensor data.
-    double temp1_raw = (analogRead(Temp_Meas1)*A - 0.5)/0.01;
-    double temp2_raw = (analogRead(Temp_Meas2)*A - 0.5)/0.01;
+    double temp1_raw = (analogReadMilliVolts(Temp_Meas1)/1000.0 - 0.5)/0.01;
+    double temp2_raw = (analogReadMilliVolts(Temp_Meas2)/1000.0 - 0.5)/0.01;
 
     if(samples1.size() > N_samples)
     {
