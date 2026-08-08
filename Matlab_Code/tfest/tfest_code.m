@@ -2,13 +2,18 @@
 
 %Package the input arrays of both transistors into one matrix (Needs to be
 %columns)
-PWM1StepV1Data = readmatrix('PWM1StepV1.csv');
+PWM1StepV1Data = readmatrix('../PWM1StepV1.csv');
 PWM1StepV1 = PWM1StepV1Data(28600:130577,1:5);
 
-PWM2StepV0Data = readmatrix('PWM2StepV0.csv');
+PWM2StepV0Data = readmatrix('../PWM2StepV0.csv');
 PWM2StepV0 = PWM2StepV0Data(13650:end,1:5);
 
 %pwm1 data prep
+
+%calculate average ambient temp 
+average_ambientT1 = mean(PWM1StepV1(:, 1));
+
+
 V_PWM1 = [PWM1StepV1(:,3)];
 Temp_PWM1 = [PWM1StepV1(:,1)-10.66, PWM1StepV1(:,2)-9.36];
 time_step = 0.01;
@@ -36,24 +41,17 @@ n_poles = [2; 2];
 n_zeors = [1;1];
 
 %estimate the transfer functions
-mimo_tranfer1 = tfest(tfest_data1,n_poles,n_zeors);
-mimo_tranfer2 = tfest(tfest_data2, n_poles, n_zeors);
+mimo_transfer1 = tfest(tfest_data1,n_poles,n_zeors);
+mimo_transfer2 = tfest(tfest_data2, n_poles, n_zeors);
 
 
-v11output = mimo_tranfer1(1,1);
-v12output = mimo_tranfer2(1,1);
-v21output = mimo_tranfer(2,1);
-v22output = mimo_tranfer(2,1);
+v11output = mimo_transfer1(1,1);
+v12output = mimo_transfer2(1,1);
+v21output = mimo_transfer1(2,1);
+v22output = mimo_transfer2(2,1);
 %bode(v2output)
 
-%figure(1)
-%step(2.844 * v11output);
-%figure(2)
-%plot(PWM1StepV1(:,5),PWM1StepV1(:,1))
-%figure(3)
-%step(v12output)
-%figure(4)
-%plot(PWM2StepV0(:,5), PWM2StepV0(:,2))
+
 
 figure(1)
 compare(tfest_data1, mimo_tranfer1);
