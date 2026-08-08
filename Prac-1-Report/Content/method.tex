@@ -1,4 +1,5 @@
 \section{Software and Hardware Design Implementation}
+\subsection{MCU Code}
 In order to allow for easier future interaction, a command system was introduced. The MCU receives commands over UART as a string with the format: \texttt{<command>, <value>}. These commands are interpreted by the MCU, changing the appropriate values.
 
 \begin{center}
@@ -35,6 +36,11 @@ The \texttt{<Message>} paramater is used to signal error data. Currently the onl
     \label{fig:MCU_Flow1}
 \end{figure}
 \pagebreak
+
+\subsection{Matlab Code}
+The Matlab code was written into a Matlab app to make it easier to operate the system. The app waits for the start button to be pressed, after which it sends the commands to the MCU to update all of the parameters set.
+
+It then sets up the plotting variables and a variable called "capturing", which is used to continue the plotting process in a while loop, until the stop button is pressed. The loop also checks the error messages received from the MCU, and displays information based on the received message.
 
 \begin{figure}
     \centering
