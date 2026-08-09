@@ -1,6 +1,10 @@
 \section{Software and Hardware Design Implementation}
 \subsection{MCU Code}
-In order to allow for easier future interaction, a command system was introduced. The MCU receives commands over UART as a string with the format: \texttt{<command>, <value>}. These commands are interpreted by the MCU, changing the appropriate values.
+In order to allow for easier future interaction, a command system was introduced. The MCU receives commands over UART as a string with the format:
+
+\texttt{"<command>, <value>"}
+
+These commands are interpreted by the MCU, changing the appropriate values.
 
 \begin{center}
     \begin{tblr}{colspec={X[c]|X[c]}, width=0.9\linewidth}
@@ -24,7 +28,7 @@ If the start variable is set, then the sampling process begins. First a timer is
 The samples are converted to temperatures using the temperature calibration equation. A running average of 200 samples is used to filer high frequency noise. The timer started at the beginning of the sampling process is then checked to see if the sampling period has passed, and if not, it waits for the remaining time.
 The processed samples are again sent over UART as a string with the format:
 
-\texttt{<Temp1>, <Temp2>, <PWM1>, <PWM2>, <Time>, <Message>}
+\texttt{"<Temp1>, <Temp2>, <PWM1>, <PWM2>, <Time>, <Message>"}
 
 
 The \texttt{<Message>} paramater is used to signal error data. Currently the only error message implemented is for if the sampling process takes longer than the set sampling period. (Currently $200~\mathrm{Hz}$)
@@ -40,7 +44,9 @@ The \texttt{<Message>} paramater is used to signal error data. Currently the onl
 \subsection{Matlab Code}
 The Matlab code was written into a Matlab app to make it easier to operate the system. The app waits for the start button to be pressed, after which it sends the commands to the MCU to update all of the parameters set.
 
-It then sets up the plotting variables and a variable called "capturing", which is used to continue the plotting process in a while loop, until the stop button is pressed. The loop also checks the error messages received from the MCU, and displays information based on the received message.
+It then sets up the plotting variables and a variable called "capturing", which is used to continue the plotting process in a while loop, until the stop button is pressed. The loop continually checks if it has received data, and if it has, it interprets the formatted string send by the MCU. It plots the received data, checks the error messages received, and displays information based on the received message.
+
+Before the loop starts a .csv file is accessed (or created if it did not exist beforehand), and the formatted string received from the MCU is saved directly to it.
 
 \begin{figure}
     \centering
