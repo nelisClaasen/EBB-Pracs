@@ -49,3 +49,98 @@ It then sets up the plotting variables and a variable called "capturing", which 
     \label{fig:Matlab_Flow1}
 \end{figure}
 \pagebreak
+
+\subsection{Hardware Development}
+
+\subsubsection{Circuit Design}
+
+The physical system consists of two identical channels, each built around a
+TIP31C power transistor and an MCP9700 linear temperature sensor. In this
+application the transistor does not operate as a signal amplifier; instead,
+it functions as a PWM-controlled current driver. The base of each transistor
+is switched by a PWM signal generated on the ESP32, which sets the average
+current delivered from the 8\,V supply through the transistor into the heat
+sink. This produces a direct causal chain from the controllable input to the
+measured output:
+\begin{center}
+PWM duty cycle $\rightarrow$ transistor conduction current $\rightarrow$
+power dissipated as heat $\rightarrow$ heat sink temperature
+$\rightarrow$ sensor output voltage
+\end{center}
+This chain constitutes the physical plant that is later identified as a
+transfer function in the third section of this report.
+
+Because the ESP32 operates its GPIO logic at 3.3\,V, the base resistor
+values were selected according to the 3.3\,V column of Table~1 in the
+practical guide: $R_1 = 270\ \Omega$ and $R_2 = 560\ \Omega$. These
+resistors were chosen to limit the base current drawn from the ESP32 GPIO
+pin to a safe level while still supplying enough current to fully switch
+the TIP31C on, given the fixed 8\,V bench-supply rail feeding the collector.
+
+The MCP9700 temperature sensor was selected as it requires no external
+signal-conditioning circuitry; its output pin can be connected directly to
+an ESP32 ADC input. The sensor was mounted in direct physical contact with
+the TIP31C package (and, by extension, the heat sink) to ensure accurate
+thermal coupling between the heat source and the measurement point.
+
+\subsubsection{Implementation}
+
+The circuit was constructed on a breadboard following the layout described
+in the practical guide, with both transistor/sensor pairs mounted such that
+their heat sinks were in direct contact with one another, ensuring
+consistent thermal cross-coupling between channels for later system
+identification of the off-diagonal transfer functions ($G_{12}$,
+$G_{21}$). The 8\,V supply rail was provided by a bench power supply set to
+its maximum allowable current limit, as an ESP32 GPIO pin cannot source
+sufficient current to drive the transistor directly. The ESP32 shared a
+common ground with the transistor circuit's power supply to ensure a
+consistent reference voltage across the system.
+
+\subsubsection{Temperature Calibration Equation}
+
+The MCP9700 does not output a digital temperature value; it is a purely
+analogue device whose output voltage varies linearly with the temperature. Microchip characterises this relationship
+in the datasheet as a first-order (linear) transfer function:
+\begin{equation}
+    V_{OUT} = T_C \cdot T_A + V_{0^{\circ}C}
+    \label{eq:sensor_transfer}
+\end{equation}
+where $V_{OUT}$ is the sensor's output voltage, $T_A$ is the ambient
+temperature, $T_C$ is the temperature coefficient (the slope of the line,
+in V/$^{\circ}$C), and $V_{0^{\circ}C}$ is the sensor's output voltage at
+0$^{\circ}$C (the y-intercept). This is a standard linear equation of the
+form $y = mx + c$.
+
+For the MCP9700/9700A/9700B family, the datasheet's DC Electrical
+Characteristics table specifies:
+\begin{equation}
+    T_C = 10.0\ \text{mV/}^{\circ}\text{C}, \qquad
+    V_{0^{\circ}C} = 500\ \text{mV}
+\end{equation}
+
+Since the ADC measures a voltage and the objective is to recover a
+temperature, Equation~\eqref{eq:sensor_transfer} is rearranged to make
+$T_A$ the subject:
+\begin{equation}
+    T_A = \frac{V_{OUT} - V_{0^{\circ}C}}{T_C}
+    \label{eq:sensor_rearranged}
+\end{equation}
+
+Substituting the datasheet constants, with the voltage values expressed in
+volts ($V_{0^{\circ}C} = 0.5$\,V, $T_C = 0.01$\,V/$^{\circ}$C):
+\begin{equation}
+    T_A(^{\circ}\text{C}) = \frac{V_{ADC} - 0.5}{0.01}
+    \label{eq:calibration_final}
+\end{equation}
+
+Equation~\eqref{eq:calibration_final} is identical to Equation~1 given in
+the practical guide. The substitution of $V_{ADC}$ for $V_{OUT}$ reflects
+the physical circuit: since the sensor output is connected directly to the
+ESP32's ADC input with no intermediate signal conditioning, the voltage
+sampled by the ADC is equal to the sensor's output voltage.
+
+The sensor required no additional physical calibration step; it is a factory-characterised property of the
+device. The datasheet specifies a typical accuracy of $\pm 4^{\circ}$C over
+the 0--70$^{\circ}$C range for the MCP9700, which represents an inherent
+source of measurement uncertainty carried into the system identification
+results discussed later in this report.
