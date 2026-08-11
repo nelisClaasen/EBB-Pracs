@@ -7,10 +7,10 @@ In order to allow for easier future interaction, a command system was introduced
 These commands are interpreted by the MCU, changing the appropriate values.
 
 \begin{center}
-    \begin{tblr}{colspec={X[c]|X[c]}, width=0.9\linewidth}
-        \hline
+    \begin{tblr}{colspec={X[c]X[c]}, width=0.9\linewidth, row{even} = {bg = gray!20}}
+        \cline[2pt]{-}
         Command     &   Value Changed   \\
-        \hline 
+        \cline[1pt]{-}
         0           &   Change P        \\
         1           &   Change I        \\
         2           &   Change D        \\
@@ -19,7 +19,7 @@ These commands are interpreted by the MCU, changing the appropriate values.
         5           &   Change Duty Cycle  \\
         6           &   Change PWM Output   \\
         7           &   Change Start Flag\\
-        \hline
+        \cline[2pt]{-}
     \end{tblr}
 \end{center}
 
