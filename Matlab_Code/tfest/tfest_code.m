@@ -55,23 +55,57 @@ n_poles = [2; 2];
 n_zeors = [1;1];
 
 %estimate the transfer functions
-mimo_transfer1 = tfest(tfest_data1,n_poles,n_zeors);
-mimo_transfer2 = tfest(tfest_data2, n_poles, n_zeors);
+simo_transfer1 = tfest(tfest_data1,n_poles,n_zeors);
+simo_transfer2 = tfest(tfest_data2, n_poles, n_zeors);
 
 
-v11output = mimo_transfer1(1,1);
-v12output = mimo_transfer2(1,1);
-v21output = mimo_transfer1(2,1);
-v22output = mimo_transfer2(2,1);
+
 %bode(v2output)
 
 
 
 figure(1)
-compare(tfest_data1, mimo_transfer1);
+compare(tfest_data1, simo_transfer1);
+legend('Location', 'best');
 figure(2)
-compare(tfest_data2, mimo_transfer2);
+compare(tfest_data2, simo_transfer2);
+legend('Location', 'best');
 figure(3)
-compare(testData1, mimo_transfer1);
+compare(testData1, simo_transfer1);
+legend('Location', 'best');
 figure(4)
-compare(testData2, mimo_transfer2);
+compare(testData2, simo_transfer2);
+legend('Location', 'best');
+
+
+%display the transfer functions of PWM1
+[num1, den1] = tfdata(simo_transfer1(1, 1), 'v');
+
+
+[num2, den2] = tfdata(simo_transfer1(2, 1), 'v');
+
+
+disp('--- Transfer Function 1 (PWM1 to T1) ---');
+disp('Numerator:'); disp(num1);
+disp('Denominator:'); disp(den1);
+
+disp('--- Transfer Function 2 (PWM1 to T2) ---');
+disp('Numerator:'); disp(num2);
+disp('Denominator:'); disp(den2);
+
+
+
+%display transfer functions of PWM2
+[num12, den12] = tfdata(simo_transfer2(1, 1), 'v');
+
+
+[num22, den22] = tfdata(simo_transfer2(2, 1), 'v');
+
+
+disp('--- Transfer Function 1 (PWM2 to T1) ---');
+disp('Numerator:'); disp(num1);
+disp('Denominator:'); disp(den1);
+
+disp('--- Transfer Function 2 (PWM2 to T2) ---');
+disp('Numerator:'); disp(num2);
+disp('Denominator:'); disp(den2);
