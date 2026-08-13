@@ -2,25 +2,36 @@
 
 %Package the input arrays of both transistors into one matrix (Needs to be
 %columns)
-PWM1StepV1Data = readmatrix('../PWM1StepV1.csv');
-PWM1StepV1 = PWM1StepV1Data(28600:130577,1:5);
+PWM1StepV1Data = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM1_V0.csv');
+PWM1StepV1 = PWM1StepV1Data(7920:end,1:5);
 
-PWM2StepV0Data = readmatrix('../PWM2StepV0.csv');
-PWM2StepV0 = PWM2StepV0Data(13650:end,1:5);
+PWM2StepV0Data = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM2_V0.csv');
+PWM2StepV0 = PWM2StepV0Data(6400:end,1:5);
+
+PWM1TestDataFile = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM1_VtestData50.csv');
+PWM1TestData = PWM1TestDataFile(6230:end,1:5);
+
+PWM2TestDataFile = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM2_VtestData50.csv');
+PWM2TestData = PWM2TestDataFile(6160:end,1:5);
 
 %pwm1 data prep
 
-%calculate average ambient temp 
-average_ambientT1 = mean(PWM1StepV1(:, 1));
-
 
 V_PWM1 = [PWM1StepV1(:,3)];
-Temp_PWM1 = [PWM1StepV1(:,1)-10.66, PWM1StepV1(:,2)-9.36];
-time_step = 0.01;
+Temp_PWM1 = [PWM1StepV1(:,1)-22.28, PWM1StepV1(:,2)-21.24];
+time_step = 0.005;
 
 %pwm2 data prep
 V_PWM2 = [PWM2StepV0(:,4)];
-Temp_PWM2 = [PWM2StepV0(:,1)-9.57, PWM2StepV0(:,2)-8.16];
+Temp_PWM2 = [PWM2StepV0(:,1)-20.26, PWM2StepV0(:,2)-19.05];
+
+%pwm1 test data prep
+V_PWM1_Test = [PWM1TestData(:,3)];
+Temp_PWM1_test = [PWM1TestData(:,1)-21.2, PWM1TestData(:,2)-20.2];
+
+%pwm2 test data prep
+V_PWM2_Test = [PWM2TestData(:,4)];
+Temp_PWM2_test = [PWM2TestData(:,1)-21.1, PWM2TestData(:,2)-20.2] ;
 
 
 
@@ -32,6 +43,9 @@ Temp_PWM2 = [PWM2StepV0(:,1)-9.57, PWM2StepV0(:,2)-8.16];
 
 tfest_data1 = iddata(Temp_PWM1, V_PWM1, time_step);
 tfest_data2 = iddata(Temp_PWM2, V_PWM2, time_step);
+testData1 = iddata(Temp_PWM1_test,V_PWM1_Test,time_step);
+testData2 = iddata(Temp_PWM2_test,V_PWM2_Test,time_step);
+
 
 
 
@@ -54,6 +68,10 @@ v22output = mimo_transfer2(2,1);
 
 
 figure(1)
-compare(tfest_data1, mimo_tranfer1);
+compare(tfest_data1, mimo_transfer1);
 figure(2)
-compare(tfest_data2, mimo_tranfer2);
+compare(tfest_data2, mimo_transfer2);
+figure(3)
+compare(testData1, mimo_transfer1);
+figure(4)
+compare(testData2, mimo_transfer2);
