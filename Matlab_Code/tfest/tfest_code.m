@@ -2,16 +2,16 @@
 
 %Package the input arrays of both transistors into one matrix (Needs to be
 %columns)
-PWM1StepV1Data = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM1_V0.csv');
+PWM1StepV1Data = readmatrix('..\Data1\Step_PWM1_V0.csv');
 PWM1StepV1 = PWM1StepV1Data(7920:end,1:5);
 
-PWM2StepV0Data = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM2_V0.csv');
+PWM2StepV0Data = readmatrix('..\Data1\Step_PWM2_V0.csv');
 PWM2StepV0 = PWM2StepV0Data(6400:end,1:5);
 
-PWM1TestDataFile = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM1_VtestData50.csv');
+PWM1TestDataFile = readmatrix('..\Data1\Step_PWM1_VtestData50.csv');
 PWM1TestData = PWM1TestDataFile(6230:end,1:5);
 
-PWM2TestDataFile = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM2_VtestData50.csv');
+PWM2TestDataFile = readmatrix('..\Data1\Step_PWM2_VtestData50.csv');
 PWM2TestData = PWM2TestDataFile(6160:end,1:5);
 
 %pwm1 data prep
@@ -59,24 +59,36 @@ simo_transfer1 = tfest(tfest_data1,n_poles,n_zeors);
 simo_transfer2 = tfest(tfest_data2, n_poles, n_zeors);
 
 
+%set up graph details
+tfest_data1.Name = 'Measured Data';
+tfest_data2.Name = 'Measured Data';
+testData1.Name = 'Measured Data';
+testData2.Name = 'Measured Data';
 
-%bode(v2output)
+simo_transfer2.Name = 'Simulated Model';
+simo_transfer1.Name = 'Simulated Model';
 
 
 
 figure(1)
 compare(tfest_data1, simo_transfer1);
 legend('Location', 'best');
+ylabel('Change in Temperature (℃)')
 figure(2)
 compare(tfest_data2, simo_transfer2);
 legend('Location', 'best');
+ylabel('Change in Temperature (℃)')
 figure(3)
 compare(testData1, simo_transfer1);
 legend('Location', 'best');
+ylabel('Change in Temperature (℃)')
 figure(4)
 compare(testData2, simo_transfer2);
 legend('Location', 'best');
+ylabel('Change in Temperature (℃)')
 
+lines = findobj(gcf, 'Type', 'Line');
+set(lines, 'LineWidth', 1.5);
 
 %display the transfer functions of PWM1
 [num1, den1] = tfdata(simo_transfer1(1, 1), 'v');

@@ -6,7 +6,14 @@ The \textbf{tfest} function was used in Matlab to fit the data to a transfer fun
 \\
 \textbf{Data Preparation:}
 \\
-The recorded data was sliced to include a sufficient amount of zero inputs i.e only measuring the ambient temperature. was broken into a voltage vector, which was the PWM input, and two temperature vectors, 
-the temperatures of each of the transistors. This data was then packaged into an iddata obeject.
+The recorded data was sliced to include a sufficient amount of zero inputs, this is required by the tfest function to properly fit the model. After which the data was broken into a voltage vector (the PWM input), and two temperature vectors 
+(temperatures of each of the transistors). The ambient temperature was subtracted from  the temperature vectors and the data was packaged into an iddata object.
+\\
+\\
+\textbf{Model Fitting:}
+\\
+Three parameters were passed to the tfest function, namely: the iddata object, the number of poles the system has, and the number of zeros the system has.
+The number of poles a system has is determined by the number of energy storing elements, in the case of this system the transistors are storing energy in the form
+of heat, thus the system has two poles. It is common practise to take the number of zeros of an unknown system as: Zeros $=$ Poles $- 1$.
 
 
