@@ -1,5 +1,84 @@
 \section{Results}
 
+\subsection{Derived FOPDT transfer functions}
+The transfer functions of the system were derived using two different methods, namely the process reaction curve method and transfer function fitting using MATLAB. Each method
+yielded a MIMO transfer function matrix with the following mathematical description:
+
+\begin{equation}
+    \begin{bmatrix}
+        Y_1(s) \\
+        Y_2(s)
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        G_{11}(s) & G_{12}(s) \\
+        G_{21}(s) & G_{22}(s)
+    \end{bmatrix}
+    \begin{bmatrix}
+        U_1(s) \\
+        U_2(s)
+    \end{bmatrix}
+\end{equation}
+
+The following table contains these two matrices.
+
+\begin{table}[htbp]
+    \centering
+    % Increases the vertical space so the fractions don't squash together
+    \renewcommand{\arraystretch}{2.5} 
+    \caption{Comparison of Transfer Functions: Transfer Function Fitting vs. Process Reaction Curve}
+    \label{tab:transfer_function_comparison}
+    \begin{tabular}{lcc}
+        \hline
+        \textbf{Thermal Pathway} & \textbf{Transfer Function Fitting (\texttt{tfest})} & \textbf{Process Reaction Curve} \\
+        \hline
+        
+        % Row 1: G11 (PWM1 to T1)
+        $G_{11}(s)$ (PWM 1 $\rightarrow$ T1) & 
+        $\frac{-0.1974s + 0.05300}{s^2 + 0.4582s + 0.0034}$ & 
+        $\frac{K_{11}}{\tau_{11} s + 1} e^{-\theta_{11} s}$ \\
+        
+        % Row 2: G12 (PWM2 to T1)
+        $G_{12}(s)$ (PWM 2 $\rightarrow$ T1) & 
+        $\frac{-0.0156 s + 0.0010}{s^2 + 0.0300 s + 0.0002}$ & 
+        $\frac{K_{12}}{\tau_{12} s + 1} e^{-\theta_{12} s}$ \\
+        
+        % Row 3: G21 (PWM1 to T2)
+        $G_{21}(s)$ (PWM 1 $\rightarrow$ T2) & 
+        $\frac{-0.0097 s + 0.0016}{s^2 + 0.0268 s + 0.0002}$ & 
+        $\frac{K_{21}}{\tau_{21} s + 1} e^{-\theta_{21} s}$ \\
+        
+        % Row 4: G22 (PWM2 to T2)
+        $G_{22}(s)$ (PWM 2 $\rightarrow$ T2) & 
+        $\frac{-0.0346 s + 0.0234}{s^2 + 0.3998 s + 0.0024}$ & 
+        $\frac{K_{22}}{\tau_{22} s + 1} e^{-\theta_{22} s}$ \\
+        
+        \hline
+    \end{tabular}
+\end{table}
+
+
+\textbf{Comment on the table}
+
+\subsection{Matlab fitting}
+The \textbf{tfest} function was used in Matlab to fit the data to a transfer function. The following steps were followed to achieve this:
+\\
+\\
+\textbf{Data Preparation:}
+\\
+The recorded data was sliced to include a sufficient amount of zero inputs, this is required by the tfest function to properly fit the model. After which the data was broken into a voltage vector (the PWM input), and two temperature vectors 
+(temperatures of each of the transistors). The ambient temperature was subtracted from  the temperature vectors and the data was packaged into an iddata object.
+\\
+\\
+\textbf{Model Fitting:}
+\\
+Three parameters were passed to the tfest function, namely: the iddata object, the number of poles the system has, and the number of zeros the system has.
+The number of poles a system has is determined by the number of energy storing elements, in the case of this system the transistors are storing energy in the form
+of heat, thus the system has two poles. It is common practise to take the number of zeros of an unknown system as: Zeros $=$ Poles $- 1$. 
+The fitted models were then plotted using the compare function as can be seen in the Figure \ref{fig:pwm1_comparison} and Figure \ref{pwm2_comparison} below.
+
+
+
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1\textwidth]{Images/PWM1Step_Compare.pdf} 
@@ -7,23 +86,28 @@
     \label{fig:pwm1_comparison}
 \end{figure}
 
+Figure \ref{fig:pwm1_comparison} displays the fitted model for both $G_{11}$ (top) and $G_{21}$ (bottom) which are similarly accurate; 94.1\% and 94.4\%, on top
+of the measured physical data.
+
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1\textwidth]{Images/PWM2Step_Compare.pdf} 
     \caption{Comparison of the physical sensor data against the simulated SIMO transfer function model for PWM 2.}
-    \label{fig:pwm1_comparison}
+    \label{fig:pwm2_comparison}
 \end{figure}
+
+
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1\textwidth]{Images/PWM1Step_TestData.pdf} 
     \caption{Comparison of the physical sensor data for a 50\% duty cycle test case against the simulated SIMO transfer function model for PWM 1.}
-    \label{fig:pwm1_comparison}
+    \label{fig:pwm1_test}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1\textwidth]{Images/PWM2Step_TestData.pdf} 
     \caption{Comparison of the physical sensor data for a 50\% duty cycle test case against the simulated SIMO transfer function model for PWM 2.}
-    \label{fig:pwm1_comparison}
+    \label{fig:pwm2_test}
 \end{figure}

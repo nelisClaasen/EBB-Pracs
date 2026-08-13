@@ -115,9 +115,9 @@ disp('Denominator:'); disp(den2);
 
 
 disp('--- Transfer Function 1 (PWM2 to T1) ---');
-disp('Numerator:'); disp(num1);
-disp('Denominator:'); disp(den1);
+disp('Numerator:'); disp(num12);
+disp('Denominator:'); disp(den12);
 
 disp('--- Transfer Function 2 (PWM2 to T2) ---');
-disp('Numerator:'); disp(num2);
-disp('Denominator:'); disp(den2);
+disp('Numerator:'); disp(num22);
+disp('Denominator:'); disp(den22);
