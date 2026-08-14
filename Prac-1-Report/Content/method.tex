@@ -6,7 +6,9 @@ In order to allow for easier future interaction, a command system was introduced
 
 These commands are interpreted by the MCU, changing the appropriate values.
 
-\begin{center}
+\begin{table}[H]
+    \caption{MCU Commands}
+    \label{tab:MCU_Commands}
     \begin{tblr}{colspec={X[c]X[c]}, width=0.9\linewidth, row{even} = {bg = gray!20}}
         \cline[2pt]{-}
         Command     &   Value Changed   \\
@@ -21,17 +23,17 @@ These commands are interpreted by the MCU, changing the appropriate values.
         7           &   Change Start Flag\\
         \cline[2pt]{-}
     \end{tblr}
-\end{center}
+\end{table}
 
 If the start variable is set, then the sampling process begins. First a timer is started, the PWM output flags variable is then checked to see which PWM signals must be set, and finally the samples are taken.
 
-The samples are converted to temperatures using the temperature calibration equation. A running average of 200 samples is used to filer high frequency noise. The timer started at the beginning of the sampling process is then checked to see if the sampling period has passed, and if not, it waits for the remaining time.
+The samples are converted to temperatures using the temperature calibration equation. A running average of 200 samples is used to filter high frequency noise. The timer started at the beginning of the sampling process is then checked to see if the sampling period has passed, and if not, it waits for the remaining time.
 The processed samples are again sent over UART as a string with the format:
 
 \texttt{"<Temp1>, <Temp2>, <PWM1>, <PWM2>, <Time>, <Message>"}
 
 
-The \texttt{<Message>} paramater is used to signal error data. Currently the only error message implemented is for if the sampling process takes longer than the set sampling period. (Currently $200~\mathrm{Hz}$)
+The \texttt{<Message>} parameter is used to signal error data. Currently, the only error message implemented is for if the sampling process takes longer than the set sampling period. (Currently $200~\mathrm{Hz}$)
 
 \begin{figure}
     \centering
@@ -42,7 +44,7 @@ The \texttt{<Message>} paramater is used to signal error data. Currently the onl
 \pagebreak
 
 \subsection{Matlab Code}
-The Matlab code was written into a Matlab app to make it easier to operate the system. The app waits for the start button to be pressed, after which it sends the commands to the MCU to update all of the parameters set.
+The Matlab code was written into a Matlab app to make it easier to operate the system. The app waits for the start button to be pressed, after which it sends the commands from table \ref{tab:MCU_Commands} to the MCU to update all the parameters set.
 
 It then sets up the plotting variables and a variable called "capturing", which is used to continue the plotting process in a while loop, until the stop button is pressed. The loop continually checks if it has received data, and if it has, it interprets the formatted string send by the MCU. It plots the received data, checks the error messages received, and displays information based on the received message.
 
@@ -65,7 +67,7 @@ TIP31C power transistor and an MCP9700 linear temperature sensor. In this
 application the transistor does not operate as a signal amplifier; instead,
 it functions as a PWM-controlled current driver. The base of each transistor
 is switched by a PWM signal generated on the ESP32, which sets the average
-current delivered from the 8\,V supply through the transistor into the heat
+current delivered from the 5\,V supply through the transistor into the heat
 sink. This produces a direct causal chain from the controllable input to the
 measured output:
 \begin{center}
@@ -81,7 +83,7 @@ values were selected according to the 3.3\,V column of Table~1 in the
 practical guide: $R_1 = 270\ \Omega$ and $R_2 = 560\ \Omega$. These
 resistors were chosen to limit the base current drawn from the ESP32 GPIO
 pin to a safe level while still supplying enough current to fully switch
-the TIP31C on, given the fixed 8\,V bench-supply rail feeding the collector.
+the TIP31C on, given the fixed 5\,V bench-supply rail feeding the collector.
 
 The MCP9700 temperature sensor was selected as it requires no external
 signal-conditioning circuitry; its output pin can be connected directly to
@@ -91,12 +93,12 @@ thermal coupling between the heat source and the measurement point.
 
 \subsubsection{Implementation}
 
-The circuit was constructed on a breadboard following the layout described
+The circuit was constructed on a veroboard following the layout described
 in the practical guide, with both transistor/sensor pairs mounted such that
 their heat sinks were in direct contact with one another, ensuring
 consistent thermal cross-coupling between channels for later system
 identification of the off-diagonal transfer functions ($G_{12}$,
-$G_{21}$). The 8\,V supply rail was provided by a bench power supply set to
+$G_{21}$). The 5\,V supply rail was provided by a bench power supply set to
 its maximum allowable current limit, as an ESP32 GPIO pin cannot source
 sufficient current to drive the transistor directly. The ESP32 shared a
 common ground with the transistor circuit's power supply to ensure a
