@@ -1,57 +1,40 @@
 %% plot_reaction_curve.m
 %
-% EBB320 Practical 1  -  Reaction Curve Method (FOPDT identification)
+% EBB320 Practical 1  -  Reaction Curve Method
 %
-% For each CSV this script produces TWO figures (one per temperature sensor)
-% and prints a full parameter summary to the console.
+% Produces ONE clean figure per CSV file:
+%   - Left  y-axis : Temp1 (blue) and Temp2 (red)
+%   - Right y-axis : PWM duty cycle % (black, 0->100 step)
+%   - y0, y_inf reference lines for both channels
+%   - t0 vertical line
+%   - White background, ready to export as PDF/PNG for manual annotation
 %
-% Each figure shows:
-%   - The temperature response curve (blue)
-%   - y0 baseline and y_inf steady-state reference lines
-%   - t0 vertical line (where the step was applied)
-%   - The tangent line drawn at the point of maximum slope (red dashed)
-%   - t1 : where the tangent crosses y0        (dot on x-axis level of y0)
-%   - t2 : where the tangent crosses y_inf     (dot on x-axis level of y_inf)
-%   - theta = t1 - t0   (dead time)
-%   - tau   = t2 - t1   (time constant)
-%   - K     = dy / du   (process gain,  degC per % duty cycle)
+% HOW TO DRAW THE TANGENT MANUALLY:
+%   1. Export: run the print command shown in the console, OR
+%      use File > Save As > PDF in the figure window.
+%   2. Open the PDF in any editor (PowerPoint, Inkscape, Adobe, etc.)
+%   3. Draw a straight line tangent to the steepest part of each curve.
+%   4. Read t1 (tangent crosses y0) and t2 (tangent crosses y_inf) from x-axis.
+%   5. theta = t1 - t0,   tau = t2 - t1,   K printed in console.
 %
-% Transfer function form:   G(s) = K * exp(-theta*s) / (tau*s + 1)
-%
-% CSV columns (no header row):
-%   Col 1  ->  Temp1  (degC)
-%   Col 2  ->  Temp2  (degC)
-%   Col 3  ->  PWM1   (V - analogue readback, noisy when active)
-%   Col 4  ->  PWM2   (V - analogue readback, clean 3.3 V when active)
-%   Col 5  ->  Time   (ms, monotonically increasing)
-%   Col 6  ->  (unused - always 100)
+% CSV columns (no header):
+%   1=Temp1(degC)  2=Temp2(degC)  3=PWM1(V)  4=PWM2(V)  5=Time(ms)  6=unused
 %
 clear; clc; close all;
 
 % =========================================================================
 %  >>>  CHANGE THIS LINE to switch between data files  <<<
-filename = "Data1/Step_PWM1_V0.csv";
+filename = "Data1/Step_PWM2_V0.csv";
 %
-%  "Data1/Step_PWM1_V0.csv"  ->  PWM1 stepped  ->  gives G11 and G21
-%  "Data1/Step_PWM2_V0.csv"  ->  PWM2 stepped  ->  gives G12 and G22
+%  "Data1/Step_PWM1_V0.csv"  ->  PWM1 stepped  ->  G11 (Temp1) and G21 (Temp2)
+%  "Data1/Step_PWM2_V0.csv"  ->  PWM2 stepped  ->  G12 (Temp1) and G22 (Temp2)
 % =========================================================================
 
 % ---- View window --------------------------------------------------------
-% Seconds of pre- and post-step data visible on screen.
-% Does NOT affect parameter calculation (all loaded data is used for that).
-preStepView  = 30;    % seconds of baseline to show before t0
-postStepView = 1300;  % seconds of response to show after t0
-% -------------------------------------------------------------------------
+preStepView  = 50;    % seconds to show before t0
+postStepView = 1300;  % seconds to show after t0% -------------------------------------------------------------------------
 
-% ---- Smoothing ----------------------------------------------------------
-% Moving-average window applied ONLY to find the max-slope point.
-% The displayed curve is always the raw data.
-% Increase smoothWin if the tangent lands on a noise spike instead of
-% the main transient.
-smoothWin = 200;      % samples  (~1 s at 200 Hz) - wider window gives cleaner slope estimate
-% -------------------------------------------------------------------------
-
-%% 1.  Load CSV -----------------------------------------------------------
+%% 1.  Load data ----------------------------------------------------------
 opts                    = detectImportOptions(filename, ...
                             "FileType", "delimitedtext", "Delimiter", ",");
 opts.VariableNamingRule = "preserve";
@@ -65,38 +48,26 @@ PWM1v  = data.PWM1;
 PWM2v  = data.PWM2;
 timeMs = data.TimeMs;
 N      = height(data);
+timeS  = (timeMs - timeMs(1)) / 1000;
 
-% Time in seconds, zeroed at the very first sample in the file
-timeS = (timeMs - timeMs(1)) / 1000;
+%% 2.  Detect stepped channel and t0 -------------------------------------
+nEdge = max(100, round(0.02 * N));
 
-%% 2.  Detect stepped channel and step time t0 ---------------------------
-% Compare the median of the first 10% of rows vs the last 10% of rows
-% for each PWM channel.  The stepped channel has the larger shift.
-% Using medians rather than range makes this robust to the ~50 mV noise
-% on the PWM1 analogue readback pin.
+med1_pre  = median(PWM1v(1:nEdge));
+med1_post = median(PWM1v(end-nEdge+1:end));
+med2_pre  = median(PWM2v(1:nEdge));
+med2_post = median(PWM2v(end-nEdge+1:end));
 
-nEdge = round(0.10 * N);
-
-med1_start = median(PWM1v(1:nEdge));
-med1_end   = median(PWM1v(end-nEdge+1:end));
-med2_start = median(PWM2v(1:nEdge));
-med2_end   = median(PWM2v(end-nEdge+1:end));
-
-shift1 = abs(med1_end - med1_start);
-shift2 = abs(med2_end - med2_start);
-
-if shift1 >= shift2
-    stepLabel  = "PWM1";
-    rawInput   = PWM1v;
-    thresh     = (med1_start + med1_end) / 2;
+if abs(med1_post - med1_pre) >= abs(med2_post - med2_pre)
+    stepLabel = "PWM1";
+    rawInput  = PWM1v;
+    thresh    = (med1_pre + med1_post) / 2;
 else
-    stepLabel  = "PWM2";
-    rawInput   = PWM2v;
-    thresh     = (med2_start + med2_end) / 2;
+    stepLabel = "PWM2";
+    rawInput  = PWM2v;
+    thresh    = (med2_pre + med2_post) / 2;
 end
 
-% Find the first sample that crosses the threshold (3-sample confirmation
-% to avoid triggering on a single noise spike)
 stepIdx = NaN;
 for k = 2 : N-1
     if rawInput(k-1) <= thresh && rawInput(k) > thresh && rawInput(k+1) > thresh
@@ -105,233 +76,245 @@ for k = 2 : N-1
     end
 end
 if isnan(stepIdx)
-    tmp = find(rawInput > thresh, 1, "first");  % simple fallback
+    tmp = find(rawInput > thresh, 1, "first");
     if ~isempty(tmp)
         stepIdx = tmp;
     else
-        error("Could not detect a step in '%s'.\nTry adjusting smoothWin or check the file.", filename);
+        error("Could not detect step in '%s'.", filename);
     end
 end
 
 t0 = timeS(stepIdx);
 
-% Duty-cycle step size in % (0-100 scale)
-dutyBefore = (median(rawInput(1:stepIdx-1))     / 3.3) * 100;
-dutyAfter  = (median(rawInput(stepIdx:end))      / 3.3) * 100;
-deltaU     = dutyAfter - dutyBefore;
-
-%% 3.  Baseline and steady-state estimates --------------------------------
-% Baseline y0  : mean of all pre-step samples (plenty of baseline in both files)
+%% 3.  Baseline and steady-state -----------------------------------------
 y1_0  = mean(Temp1(1:stepIdx-1));
 y2_0  = mean(Temp2(1:stepIdx-1));
 
-% Steady-state y_inf : mean of the last 1% of all loaded samples
-% (uses the very end of the ~1250 s recording where the curve is flattest)
 tailIdx = max(stepIdx+1, round(0.99 * N));
-y1Inf  = mean(Temp1(tailIdx:end));
-y2Inf  = mean(Temp2(tailIdx:end));
+y1Inf = mean(Temp1(tailIdx:end));
+y2Inf = mean(Temp2(tailIdx:end));
 
-% Process gains
-K1 = (y1Inf - y1_0) / deltaU;
-K2 = (y2Inf - y2_0) / deltaU;
+% K uses delta_u = 100% (displayed PWM step is 0->100)
+K1 = (y1Inf - y1_0) / 100;
+K2 = (y2Inf - y2_0) / 100;
 
-%% 4.  Tangent-line analysis (FOPDT parameters) ---------------------------
-% Work only on post-step data
+%% 4.  Tangent lines anchored at user-specified points -------------------
+% These coordinates were read from the data cursor on the steepest part
+% of each curve. Change them here if you want to adjust the tangent.
+%
+%   Temp1 anchor:  (tAnchor1, yAnchor1)
+%   Temp2 anchor:  (tAnchor2, yAnchor2)
+%
+tAnchor1 = 84.313;    yAnchor1 = 22.88;    % point on Temp1 at steepest slope
+tAnchor2 = 93.683;    yAnchor2 = 28.6215;  % point on Temp2 at steepest slope
+
+smoothWin = 200;   % samples for slope smoothing (~1 s at 200 Hz)
+
+% Post-step indices
 postIdx = stepIdx : N;
 tPost   = timeS(postIdx);
+dt      = mean(diff(tPost));
 
-% Smooth then differentiate (slope-finding only; raw curve still plotted)
-sm1  = movmean(Temp1(postIdx), smoothWin);
-sm2  = movmean(Temp2(postIdx), smoothWin);
-dt   = mean(diff(tPost));           % ~5 ms uniform spacing
-dT1  = gradient(sm1, dt);
-dT2  = gradient(sm2, dt);
+% Smooth and differentiate both channels
+sm1 = movmean(Temp1(postIdx), smoothWin);
+dT1 = gradient(sm1, dt);
+sm2 = movmean(Temp2(postIdx), smoothWin);
+dT2 = gradient(sm2, dt);
 
-[~, iMax1] = max(abs(dT1));
-[~, iMax2] = max(abs(dT2));
+% Find anchor: use user-specified point if given, else auto max-slope
+if isnan(tAnchor1)
+    [~, iAnc1] = max(abs(dT1));
+    tAnchor1 = tPost(iAnc1);
+    yAnchor1 = Temp1(postIdx(iAnc1));
+else
+    [~, iAnc1] = min(abs(tPost - tAnchor1));
+end
+if isnan(tAnchor2)
+    [~, iAnc2] = max(abs(dT2));
+    tAnchor2 = tPost(iAnc2);
+    yAnchor2 = Temp2(postIdx(iAnc2));
+else
+    [~, iAnc2] = min(abs(tPost - tAnchor2));
+end
+m1 = dT1(iAnc1);
+m2 = dT2(iAnc2);
 
-% Tangent anchor point (use RAW temperature value, not smoothed)
-tTan1 = tPost(iMax1);    yTan1 = Temp1(postIdx(iMax1));
-tTan2 = tPost(iMax2);    yTan2 = Temp2(postIdx(iMax2));
-m1    = dT1(iMax1);
-m2    = dT2(iMax2);
+% Use user anchor as the tangent point
+tTan1 = tAnchor1;   yTan1 = yAnchor1;
+tTan2 = tAnchor2;   yTan2 = yAnchor2;
 
-% Tangent intersections:   t = tTan + (y_target - yTan) / m
-t1_1 = tTan1 + (y1_0  - yTan1) / m1;   % tangent crosses y0
-t2_1 = tTan1 + (y1Inf - yTan1) / m1;   % tangent crosses y_inf
+% Intersection times with y0 and y_inf
+t1_1 = tTan1 + (y1_0  - yTan1) / m1;
+t2_1 = tTan1 + (y1Inf - yTan1) / m1;
 t1_2 = tTan2 + (y2_0  - yTan2) / m2;
 t2_2 = tTan2 + (y2Inf - yTan2) / m2;
 
 % FOPDT parameters
-theta1 = t1_1 - t0;
-tau1   = t2_1 - t1_1;
-theta2 = t1_2 - t0;
-tau2   = t2_2 - t1_2;
+theta1 = t1_1 - t0;   tau1 = t2_1 - t1_1;
+theta2 = t1_2 - t0;   tau2 = t2_2 - t1_2;
 
-%% 5.  Build tangent line plot segments ----------------------------------
-% Extend the line slightly past t1 and t2 so the intersections are visible
-[tanX1, tanY1] = buildTangent(tTan1, yTan1, m1, y1_0, y1Inf);
-[tanX2, tanY2] = buildTangent(tTan2, yTan2, m2, y2_0, y2Inf);
+% Build tangent line vectors (never extend left of t0)
+pad   = 0.05;
+[tanX1, tanY1] = makeTangent(tTan1, yTan1, m1, y1_0, y1Inf, pad, t0);
+[tanX2, tanY2] = makeTangent(tTan2, yTan2, m2, y2_0, y2Inf, pad, t0);
 
-%% 6.  Shared x-axis view limits -----------------------------------------
-xLo  = max(0,          t0 - preStepView);
-xHi  = min(timeS(end), t0 + postStepView);
-xLim = [xLo, xHi];
+%% 5.  Build clean 0->100 PWM step vectors --------------------------------
+tPWM  = [timeS(1);  timeS(stepIdx-1);  timeS(stepIdx);  timeS(end)];
+duPWM = [0;         0;                 100;              100       ];
 
-%% 7.  Figure 1 - Temp1 --------------------------------------------------
-figure("Name", sprintf("Reaction Curve: %s to Temp1", stepLabel), ...
-       "Color", "w", "Units", "normalized", "Position", [0.02 0.08 0.46 0.78]);
+%% 5.  Plot ---------------------------------------------------------------
+xLo = max(0,          t0 - preStepView);
+xHi = min(timeS(end), t0 + postStepView);
+
+fig = figure("Color", [1 1 1], ...
+             "Units", "normalized", ...
+             "Position", [0.03 0.06 0.92 0.82], ...
+             "Name", sprintf("Reaction Curve: %s", stepLabel));
+
+% -- Left axis: temperatures ---------------------------------------------
+yyaxis left;
 hold on;
 
-% Response curve
-hR1 = plot(timeS, Temp1, "Color", [0.18 0.44 0.72], "LineWidth", 1.6, ...
-           "DisplayName", "Temp1 response");
+hT1 = plot(timeS, Temp1, ...
+           "Color", [0.18 0.44 0.72], ...
+           "LineWidth", 1.0, ...
+           "DisplayName", sprintf("Temp1  (y0=%.2f, yinf=%.2f degC)", y1_0, y1Inf));
 
-% Reference lines
-hY0a  = yline(y1_0,  "LineStyle", ":", "Color", [0.5 0.5 0.5], "LineWidth", 1.2, ...
-              "DisplayName", sprintf("y_0 = %.2f degC", y1_0));
-hYIa  = yline(y1Inf, "LineStyle", "--","Color", [0.10 0.60 0.10], "LineWidth", 1.2, ...
-              "DisplayName", sprintf("y_inf = %.2f degC", y1Inf));
-hT0a  = xline(t0, "LineStyle", "--", "Color", [0.15 0.15 0.15], "LineWidth", 1.3, ...
-              "DisplayName", sprintf("t_0 = %.1f s", t0));
+hT2 = plot(timeS, Temp2, ...
+           "Color", [0.85 0.15 0.15], ...
+           "LineWidth", 1.0, ...
+           "DisplayName", sprintf("Temp2  (y0=%.2f, yinf=%.2f degC)", y2_0, y2Inf));
 
-% Tangent
-hTn1  = plot(tanX1, tanY1, "r--", "LineWidth", 2.0, ...
-             "DisplayName", "Tangent at max slope");
+% Temp1 reference lines
+yline(y1_0,  "LineStyle", ":", "Color", [0.18 0.44 0.72], ...
+      "LineWidth", 0.8, "HandleVisibility", "off");
+yline(y1Inf, "LineStyle", "--", "Color", [0.18 0.44 0.72], ...
+      "LineWidth", 0.8, "HandleVisibility", "off");
 
-% t1 and t2 marker dots
-hP1a  = plot(t1_1, y1_0,  "o", "MarkerSize", 9, "MarkerFaceColor", "r", ...
-             "MarkerEdgeColor", "k", "LineWidth", 1, ...
-             "DisplayName", sprintf("t_1 = %.1f s", t1_1));
-hP2a  = plot(t2_1, y1Inf, "o", "MarkerSize", 9, "MarkerFaceColor", [0.8 0 0.8], ...
-             "MarkerEdgeColor", "k", "LineWidth", 1, ...
-             "DisplayName", sprintf("t_2 = %.1f s", t2_1));
+% Temp2 reference lines
+yline(y2_0,  "LineStyle", ":", "Color", [0.85 0.15 0.15], ...
+      "LineWidth", 0.8, "HandleVisibility", "off");
+yline(y2Inf, "LineStyle", "--", "Color", [0.85 0.15 0.15], ...
+      "LineWidth", 0.8, "HandleVisibility", "off");
 
-% Max-slope triangle marker
-hPka  = plot(tTan1, yTan1, "^", "MarkerSize", 9, "MarkerFaceColor", "k", ...
-             "MarkerEdgeColor", "k", "DisplayName", "Max slope point");
+% Tangent lines (plotted as data - data cursor works on these)
+hTn1 = plot(tanX1, tanY1, "--", "Color", [0.18 0.44 0.72], ...
+            "LineWidth", 1.2, ...
+            "DisplayName", sprintf("Tangent Temp1  t1=%.1fs  t2=%.1fs", t1_1, t2_1));
+hTn2 = plot(tanX2, tanY2, "--", "Color", [0.85 0.15 0.15], ...
+            "LineWidth", 1.2, ...
+            "DisplayName", sprintf("Tangent Temp2  t1=%.1fs  t2=%.1fs", t1_2, t2_2));
 
-% Vertical drop-lines at t1 and t2
-yBase1 = min(y1_0, y1Inf);
-plot([t1_1 t1_1], [yBase1, y1_0],   ":", "Color", "r",          "LineWidth", 1.0, "HandleVisibility", "off");
-plot([t2_1 t2_1], [yBase1, y1Inf],  ":", "Color", [0.8 0 0.8],  "LineWidth", 1.0, "HandleVisibility", "off");
+% t1 and t2 marker dots on the tangent lines
+plot(t1_1, y1_0,  "o", "MarkerSize", 7, "MarkerFaceColor", [0.18 0.44 0.72], ...
+     "MarkerEdgeColor", "k", "HandleVisibility", "off");
+plot(t2_1, y1Inf, "s", "MarkerSize", 7, "MarkerFaceColor", [0.18 0.44 0.72], ...
+     "MarkerEdgeColor", "k", "HandleVisibility", "off");
+plot(t1_2, y2_0,  "o", "MarkerSize", 7, "MarkerFaceColor", [0.85 0.15 0.15], ...
+     "MarkerEdgeColor", "k", "HandleVisibility", "off");
+plot(t2_2, y2Inf, "s", "MarkerSize", 7, "MarkerFaceColor", [0.85 0.15 0.15], ...
+     "MarkerEdgeColor", "k", "HandleVisibility", "off");
+axL = gca;
+axL.Color    = [1 1 1];
+axL.YColor   = [0 0 0];
+ylabel("Temperature  (degC)", "FontSize", 12, "Color", [0 0 0]);
 
-% Parameter annotation box (yellow background)
-annStr1 = sprintf("theta = %.1f s\ntau   = %.1f s\nK     = %.4f degC/%%", theta1, tau1, K1);
-text(xLo + 0.03*(xHi-xLo), y1_0 + 0.20*(y1Inf-y1_0), annStr1, ...
-     "FontSize", 10, "FontWeight", "bold", "FontName", "Courier", ...
-     "BackgroundColor", [1.0 1.0 0.80], "EdgeColor", [0.6 0.6 0.3], ...
-     "Margin", 5, "VerticalAlignment", "bottom");
+% -- Right axis: PWM 0->100 step -----------------------------------------
+yyaxis right;
 
-hold off;
-grid on; grid minor; box on;
-xlim(xLim);
-xlabel("Time  (s)",          "FontSize", 11);
-ylabel("Temperature  (degC)","FontSize", 11);
-title(sprintf("Reaction Curve  -  Temp1 response to %s step", stepLabel), ...
-      "FontSize", 12, "FontWeight", "bold");
-legend([hR1 hTn1 hY0a hYIa hT0a hP1a hP2a hPka], ...
-       "Location", "southeast", "NumColumns", 2, "FontSize", 9);
+hPWM = plot(tPWM, duPWM * 3.3 / 100, ...
+            "Color", [0.1 0.1 0.1], ...
+            "LineWidth", 1.0, ...
+            "DisplayName", sprintf("%s  (0 to 3.3 V)", stepLabel));
 
-%% 8.  Figure 2 - Temp2 --------------------------------------------------
-figure("Name", sprintf("Reaction Curve: %s to Temp2", stepLabel), ...
-       "Color", "w", "Units", "normalized", "Position", [0.52 0.08 0.46 0.78]);
-hold on;
+axR = gca;
+axR.YColor = [0 0 0];
+ylabel("PWM Voltage  (V)", "FontSize", 12, "Color", [0 0 0]);
+ylim([-0.3 4.0]);
+yticks(0:0.5:3.5);
 
-hR2  = plot(timeS, Temp2, "Color", [0.18 0.44 0.72], "LineWidth", 1.6, ...
-            "DisplayName", "Temp2 response");
-
-hY0b = yline(y2_0,  "LineStyle", ":", "Color", [0.5 0.5 0.5], "LineWidth", 1.2, ...
-             "DisplayName", sprintf("y_0 = %.2f degC", y2_0));
-hYIb = yline(y2Inf, "LineStyle", "--","Color", [0.10 0.60 0.10], "LineWidth", 1.2, ...
-             "DisplayName", sprintf("y_inf = %.2f degC", y2Inf));
-hT0b = xline(t0, "LineStyle", "--", "Color", [0.15 0.15 0.15], "LineWidth", 1.3, ...
-             "DisplayName", sprintf("t_0 = %.1f s", t0));
-
-hTn2 = plot(tanX2, tanY2, "r--", "LineWidth", 2.0, ...
-            "DisplayName", "Tangent at max slope");
-
-hP1b = plot(t1_2, y2_0,  "o", "MarkerSize", 9, "MarkerFaceColor", "r", ...
-            "MarkerEdgeColor", "k", "LineWidth", 1, ...
-            "DisplayName", sprintf("t_1 = %.1f s", t1_2));
-hP2b = plot(t2_2, y2Inf, "o", "MarkerSize", 9, "MarkerFaceColor", [0.8 0 0.8], ...
-            "MarkerEdgeColor", "k", "LineWidth", 1, ...
-            "DisplayName", sprintf("t_2 = %.1f s", t2_2));
-hPkb = plot(tTan2, yTan2, "^", "MarkerSize", 9, "MarkerFaceColor", "k", ...
-            "MarkerEdgeColor", "k", "DisplayName", "Max slope point");
-
-yBase2 = min(y2_0, y2Inf);
-plot([t1_2 t1_2], [yBase2, y2_0],  ":", "Color", "r",         "LineWidth", 1.0, "HandleVisibility", "off");
-plot([t2_2 t2_2], [yBase2, y2Inf], ":", "Color", [0.8 0 0.8], "LineWidth", 1.0, "HandleVisibility", "off");
-
-annStr2 = sprintf("theta = %.1f s\ntau   = %.1f s\nK     = %.4f degC/%%", theta2, tau2, K2);
-text(xLo + 0.03*(xHi-xLo), y2_0 + 0.20*(y2Inf-y2_0), annStr2, ...
-     "FontSize", 10, "FontWeight", "bold", "FontName", "Courier", ...
-     "BackgroundColor", [1.0 1.0 0.80], "EdgeColor", [0.6 0.6 0.3], ...
-     "Margin", 5, "VerticalAlignment", "bottom");
+% -- t0 vertical line ----------------------------------------------------
+yyaxis left;
+ht0 = xline(t0, ...
+            "LineStyle", "--", ...
+            "Color", [0.3 0.3 0.3], ...
+            "LineWidth", 0.8, ...
+            "DisplayName", sprintf("t_0 = %.1f s", t0));
 
 hold off;
-grid on; grid minor; box on;
-xlim(xLim);
-xlabel("Time  (s)",          "FontSize", 11);
-ylabel("Temperature  (degC)","FontSize", 11);
-title(sprintf("Reaction Curve  -  Temp2 response to %s step (coupling)", stepLabel), ...
-      "FontSize", 12, "FontWeight", "bold");
-legend([hR2 hTn2 hY0b hYIb hT0b hP1b hP2b hPkb], ...
-       "Location", "southeast", "NumColumns", 2, "FontSize", 9);
 
-%% 9.  Console summary ----------------------------------------------------
-numStr = regexp(stepLabel, '\d+', 'match');
-num    = numStr{1};
+% -- Axes and figure formatting ------------------------------------------
+axL.Color          = [1 1 1];
+axL.GridColor      = [0.75 0.75 0.75];
+axL.MinorGridColor = [0.88 0.88 0.88];
+axL.GridAlpha      = 0.9;
+axL.MinorGridAlpha = 0.7;
+axL.XColor         = [0 0 0];
+axL.FontSize       = 10;
 
+grid on;
+grid minor;
+box on;
+xlim([xLo xHi]);
+xlabel("Time  (s)", "FontSize", 12, "Color", [0 0 0]);
+title(sprintf("Reaction Curve  -  %s step  (Temp1 & Temp2)", stepLabel), ...
+      "FontSize", 13, "FontWeight", "bold", "Color", [0 0 0]);
+
+legend([hT1, hT2, hTn1, hTn2, hPWM, ht0], ...
+       "Location", "east", "FontSize", 10, "Box", "on", ...
+       "Color", [1 1 1], "TextColor", [0 0 0]);
+
+% -- Reference line labels -----------------------------------------------
+yyaxis left;
+yRng = ylim;
+span = yRng(2) - yRng(1);
+xTxt = xLo + 0.012*(xHi - xLo);
+
+text(xTxt, y1_0  + 0.014*span, sprintf("y0,1=%.2f",   y1_0),  ...
+     "Color", [0.18 0.44 0.72], "FontSize", 8, "FontWeight", "bold");
+text(xTxt, y1Inf + 0.014*span, sprintf("yinf,1=%.2f", y1Inf), ...
+     "Color", [0.18 0.44 0.72], "FontSize", 8, "FontWeight", "bold");
+text(xTxt, y2_0  - 0.022*span, sprintf("y0,2=%.2f",   y2_0),  ...
+     "Color", [0.85 0.15 0.15], "FontSize", 8, "FontWeight", "bold");
+text(xTxt, y2Inf - 0.022*span, sprintf("yinf,2=%.2f", y2Inf), ...
+     "Color", [0.85 0.15 0.15], "FontSize", 8, "FontWeight", "bold");
+
+%% 6.  Console summary ---------------------------------------------------
+fprintf("\n+----------------------------------------------------------+\n");
+fprintf("  File            : %s\n",     filename);
+fprintf("  Stepped channel : %s\n",     stepLabel);
+fprintf("  t0              : %.2f s\n", t0);
+fprintf("  delta_u         : 100%%  (0 -> 100%% as displayed)\n");
 fprintf("\n");
-fprintf("+------------------------------------------------------+\n");
-fprintf("  Reaction Curve Results  -  %s\n", filename);
-fprintf("+------------------------------------------------------+\n");
-fprintf("  Stepped channel  : %s\n",      stepLabel);
-fprintf("  Duty cycle step  : %.1f %%  (%.1f -> %.1f %%)\n", deltaU, dutyBefore, dutyAfter);
-fprintf("  t0 (step time)   : %.2f s\n\n", t0);
+fprintf("  Temp1:  y0=%.3f  yinf=%.3f  dy=%.3f degC\n", y1_0, y1Inf, y1Inf-y1_0);
+fprintf("  Temp2:  y0=%.3f  yinf=%.3f  dy=%.3f degC\n", y2_0, y2Inf, y2Inf-y2_0);
+  fprintf("  K1 = dy/du = %.4f degC/%%\n", K1);
+fprintf("  K2 = dy/du = %.4f degC/%%\n", K2);
+fprintf("\n");
+fprintf("  Temp1:  t1=%.2fs  t2=%.2fs  theta=%.2fs  tau=%.2fs\n", t1_1, t2_1, theta1, tau1);
+fprintf("  Temp2:  t1=%.2fs  t2=%.2fs  theta=%.2fs  tau=%.2fs\n", t1_2, t2_2, theta2, tau2);
+fprintf("\n");
+fprintf("  G11(s) = %.4f * exp(-%.2f*s) / (%.2f*s + 1)\n", K1, theta1, tau1);
+fprintf("  G21(s) = %.4f * exp(-%.2f*s) / (%.2f*s + 1)\n", K2, theta2, tau2);
+fprintf("\n");
+fprintf("  Circle  marker = t1 (tangent x y0)\n");
+fprintf("  Square  marker = t2 (tangent x y_inf)\n");
+fprintf("  Run:  datacursormode on  to click and verify points.\n");
+fprintf("+----------------------------------------------------------+\n\n");
+fprintf("  Export command (run in Command Window):\n");
+fprintf("  >> print(fig, 'reaction_curve_%s', '-dpdf', '-bestfit')\n\n", stepLabel);
 
-fprintf("  [ Temp1  (G%s1) ]\n", num);
-fprintf("    y0      = %.3f degC\n",   y1_0);
-fprintf("    y_inf   = %.3f degC\n",   y1Inf);
-fprintf("    delta_y = %.3f degC\n",   y1Inf - y1_0);
-fprintf("    t1      = %.2f s\n",      t1_1);
-fprintf("    t2      = %.2f s\n",      t2_1);
-fprintf("    theta   = %.2f s   (dead time)\n",      theta1);
-fprintf("    tau     = %.2f s   (time constant)\n",  tau1);
-fprintf("    K       = %.4f degC/%%  (process gain)\n", K1);
-fprintf("    G(s)    = %.4f * exp(-%.2f*s) / (%.2f*s + 1)\n\n", K1, theta1, tau1);
-
-fprintf("  [ Temp2  (G%s2) ]\n", num);
-fprintf("    y0      = %.3f degC\n",   y2_0);
-fprintf("    y_inf   = %.3f degC\n",   y2Inf);
-fprintf("    delta_y = %.3f degC\n",   y2Inf - y2_0);
-fprintf("    t1      = %.2f s\n",      t1_2);
-fprintf("    t2      = %.2f s\n",      t2_2);
-fprintf("    theta   = %.2f s   (dead time)\n",      theta2);
-fprintf("    tau     = %.2f s   (time constant)\n",  tau2);
-fprintf("    K       = %.4f degC/%%  (process gain)\n", K2);
-fprintf("    G(s)    = %.4f * exp(-%.2f*s) / (%.2f*s + 1)\n\n", K2, theta2, tau2);
-
-fprintf("  FOPDT form:  G(s) = K * exp(-theta*s) / (tau*s + 1)\n\n");
-
-%% -----------------------------------------------------------------------
-%  LOCAL FUNCTION  (must be at the end of the script file)
-% -----------------------------------------------------------------------
-function [tx, ty] = buildTangent(tTan, yTan, m, y0, yInf)
-% Returns x/y coordinates for the tangent line segment, clipped to the
-% y-range [y0, y_inf] with a small 5% padding on each side.
-    pad = 0.05 * abs(yInf - y0);
-    yLo = min(y0, yInf) - pad;
-    yHi = max(y0, yInf) + pad;
-    % t values at the clipping boundaries
-    tLo = tTan + (yLo - yTan) / m;
-    tHi = tTan + (yHi - yTan) / m;
-    tx  = linspace(min(tLo, tHi), max(tLo, tHi), 400);
-    ty  = m * (tx - tTan) + yTan;
-    % Clip
-    keep = ty >= yLo & ty <= yHi;
+%% Local function ---------------------------------------------------------
+function [tx, ty] = makeTangent(tTan, yTan, m, y0, yInf, pad, tMin)
+    if nargin < 7, tMin = -Inf; end
+    span = abs(yInf - y0);
+    yLo  = min(y0, yInf) - pad * span;
+    yHi  = max(y0, yInf) + pad * span;
+    tLo  = tTan + (yLo - yTan) / m;
+    tHi  = tTan + (yHi - yTan) / m;
+    tx   = linspace(min(tLo, tHi), max(tLo, tHi), 400);
+    ty   = m * (tx - tTan) + yTan;
+    keep = ty >= yLo & ty <= yHi & tx >= tMin;
     tx   = tx(keep);
     ty   = ty(keep);
 end

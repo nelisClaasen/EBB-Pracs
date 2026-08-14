@@ -101,22 +101,22 @@ The following table contains these two matrices.
         % Row 1: G11 (PWM1 to T1)
         $G_{11}(s)$ (PWM 1 $\rightarrow$ T1) & 
         $\frac{-0.1974s + 0.05300}{s^2 + 0.4582s + 0.0034}$ & 
-        $\frac{K_{11}}{\tau_{11} s + 1} e^{-\theta_{11} s}$ \\
+        $\frac{15.376}{158.9s + 1} e^{-4.0s}$ \\
         
         % Row 2: G12 (PWM2 to T1)
         $G_{12}(s)$ (PWM 2 $\rightarrow$ T1) & 
         $\frac{-0.0156 s + 0.0010}{s^2 + 0.0300 s + 0.0002}$ & 
-        $\frac{K_{12}}{\tau_{12} s + 1} e^{-\theta_{12} s}$ \\
+        $\frac{6.724}{198.0s + 1} e^{-29.0s}$ \\
         
         % Row 3: G21 (PWM1 to T2)
         $G_{21}(s)$ (PWM 1 $\rightarrow$ T2) & 
         $\frac{-0.0097 s + 0.0016}{s^2 + 0.0268 s + 0.0002}$ & 
-        $\frac{K_{21}}{\tau_{21} s + 1} e^{-\theta_{21} s}$ \\
+        $\frac{10.430}{328.5s + 1} e^{-18.7s}$ \\
         
         % Row 4: G22 (PWM2 to T2)
         $G_{22}(s)$ (PWM 2 $\rightarrow$ T2) & 
         $\frac{-0.0346 s + 0.0234}{s^2 + 0.3998 s + 0.0024}$ & 
-        $\frac{K_{22}}{\tau_{22} s + 1} e^{-\theta_{22} s}$ \\
+        $\frac{9.712}{198.0s + 1} e^{-1.5s}$ \\
         
         \hline
     \end{tabular}
@@ -124,6 +124,157 @@ The following table contains these two matrices.
 
 
 \textbf{Comment on the table}
+
+\subsection{Process Reaction Curve Method}
+Figures~\ref{fig:pwm1_reaction} and \ref{fig:pwm2_reaction} show the reaction
+curves obtained from the PWM1 and PWM2 step tests respectively. The tangent line
+at the point of maximum slope is drawn for each channel, with markers indicating
+$t_1$ (tangent intersects $y_0$) and $t_2$ (tangent intersects $y_\infty$).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/PWM1.pdf}
+    \caption{Reaction curve for PWM1 step input showing Temp1 and Temp2 responses.}
+    \label{fig:pwm1_reaction}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/PWM2.pdf}
+    \caption{Reaction curve for PWM2 step input showing Temp1 and Temp2 responses.}
+    \label{fig:pwm2_reaction}
+\end{figure}
+
+\clearpage
+
+
+\subsubsection{Derived FOPDT Transfer Functions}
+
+\subsubsection{Variables Derived from Process Reaction Curves}
+
+The following variables were derived from the reaction curves using the tangent
+line method. All derivations were performed using the plots obtained in MATLAB.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.8}
+\caption{Variables for $G_{11}$}
+\begin{tabular}{ll}
+\hline
+Variable & Value \\
+\hline
+$t_0$ & $40.8\ \mathrm{s}$ \\
+$t_1$ & $44.8\ \mathrm{s}$ \\
+$t_2$ & $203.7\ \mathrm{s}$ \\
+$\Delta u$ & $3.3\ \mathrm{V}$ \\
+$\Delta y$ & $73.01 - 22.27 = 50.74\ ^\circ\mathrm{C}$ \\
+$\theta$ & $44.8 - 40.8 = 4.0\ \mathrm{s}$ \\
+$\tau$ & $203.7 - 44.8 = 158.9\ \mathrm{s}$ \\
+$K$ & $\dfrac{50.74}{3.3} = 15.376\ ^\circ\mathrm{C}/\mathrm{V}$ \\[6pt]
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.8}
+\caption{Variables for $G_{21}$}
+\begin{tabular}{ll}
+\hline
+Variable & Value \\
+\hline
+$t_0$ & $40.8\ \mathrm{s}$ \\
+$t_1$ & $59.5\ \mathrm{s}$ \\
+$t_2$ & $388.0\ \mathrm{s}$ \\
+$\Delta u$ & $3.3\ \mathrm{V}$ \\
+$\Delta y$ & $55.66 - 21.24 = 34.42\ ^\circ\mathrm{C}$ \\
+$\theta$ & $59.5 - 40.8 = 18.7\ \mathrm{s}$ \\
+$\tau$ & $388.0 - 59.5 = 328.5\ \mathrm{s}$ \\
+$K$ & $\dfrac{34.42}{3.3} = 10.430\ ^\circ\mathrm{C}/\mathrm{V}$ \\[6pt]
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.8}
+\caption{Variables for $G_{12}$}
+\begin{tabular}{ll}
+\hline
+Variable & Value \\
+\hline
+$t_0$ & $33.0\ \mathrm{s}$ \\
+$t_1$ & $62.0\ \mathrm{s}$ \\
+$t_2$ & $260.0\ \mathrm{s}$ \\
+$\Delta u$ & $3.3\ \mathrm{V}$ \\
+$\Delta y$ & $42.44 - 20.25 = 22.19\ ^\circ\mathrm{C}$ \\
+$\theta$ & $62.0 - 33.0 = 29.0\ \mathrm{s}$ \\
+$\tau$ & $260.0 - 62.0 = 198.0\ \mathrm{s}$ \\
+$K$ & $\dfrac{22.19}{3.3} = 6.724\ ^\circ\mathrm{C}/\mathrm{V}$ \\[6pt]
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.8}
+\caption{Variables for $G_{22}$}
+\begin{tabular}{ll}
+\hline
+Variable & Value \\
+\hline
+$t_0$ & $33.0\ \mathrm{s}$ \\
+$t_1$ & $34.5\ \mathrm{s}$ \\
+$t_2$ & $232.5\ \mathrm{s}$ \\
+$\Delta u$ & $3.3\ \mathrm{V}$ \\
+$\Delta y$ & $51.09 - 19.04 = 32.05\ ^\circ\mathrm{C}$ \\
+$\theta$ & $34.5 - 33.0 = 1.5\ \mathrm{s}$ \\
+$\tau$ & $232.5 - 34.5 = 198.0\ \mathrm{s}$ \\
+$K$ & $\dfrac{32.05}{3.3} = 9.712\ ^\circ\mathrm{C}/\mathrm{V}$ \\[6pt]
+\hline
+\end{tabular}
+\end{table}
+
+The resulting FOPDT transfer functions are:
+
+\begin{equation}
+    G_{11}(s) = \frac{15.376\, e^{-4.0s}}{158.9s + 1}
+    \label{eq:G11}
+\end{equation}
+
+\begin{equation}
+    G_{21}(s) = \frac{10.430\, e^{-18.7s}}{328.5s + 1}
+    \label{eq:G21}
+\end{equation}
+
+\begin{equation}
+    G_{12}(s) = \frac{6.724\, e^{-29.0s}}{198.0s + 1}
+    \label{eq:G12}
+\end{equation}
+
+\begin{equation}
+    G_{22}(s) = \frac{9.712\, e^{-1.5s}}{198.0s + 1}
+    \label{eq:G22}
+\end{equation}
+
+\subsubsection{Summary of Process Reaction Curve Results}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.5}
+\caption{Process Reaction Curve results summary}
+\begin{tabular}{lllll}
+\hline
+Transfer Function & $K$ (°C/V) & $\tau$ (s) & $\theta$ (s) & Method \\
+\hline
+$G_{11}(s)$ & 15.376 & 158.9 & 4.0  & PRC \\
+$G_{21}(s)$ & 10.430 & 328.5 & 18.7 & PRC \\
+$G_{12}(s)$ & 6.724  & 198.0 & 29.0 & PRC \\
+$G_{22}(s)$ & 9.712  & 198.0 & 1.5  & PRC \\
+\hline
+\end{tabular}
+\end{table}
+
 
 \subsection{Matlab fitting}
 The \textbf{tfest} function was used in Matlab to fit the data to a transfer function. The following steps were followed to achieve this:
@@ -144,7 +295,7 @@ The fitted models were then plotted using the compare function as can be seen in
 
 
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{Images/PWM1Step_Compare.pdf} 
     \caption{Comparison of the physical sensor data against the simulated SIMO transfer function model for PWM 1.}
@@ -154,7 +305,7 @@ The fitted models were then plotted using the compare function as can be seen in
 Figure \ref{fig:pwm1_comparison} displays the fitted model for both $G_{11}$ (top) and $G_{21}$ (bottom) which are similarly accurate; 94.1\% and 94.4\%, on top
 of the measured physical data.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{Images/PWM2Step_Compare.pdf} 
     \caption{Comparison of the physical sensor data against the simulated SIMO transfer function model for PWM 2.}
@@ -163,14 +314,14 @@ of the measured physical data.
 
 
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{Images/PWM1Step_TestData.pdf} 
     \caption{Comparison of the physical sensor data for a 50\% duty cycle test case against the simulated SIMO transfer function model for PWM 1.}
     \label{fig:pwm1_test}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{Images/PWM2Step_TestData.pdf} 
     \caption{Comparison of the physical sensor data for a 50\% duty cycle test case against the simulated SIMO transfer function model for PWM 2.}
