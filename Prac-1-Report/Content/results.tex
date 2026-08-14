@@ -154,7 +154,7 @@ The recorded data was sliced to include a sufficient amount of zero inputs, this
 Three parameters were passed to the tfest function, namely: the iddata object, the number of poles the system has, and the number of zeros the system has.
 The number of poles a system has is determined by the number of energy storing elements, in the case of this system the transistors are storing energy in the form
 of heat, thus the system has two poles. It is common practise to take the number of zeros of an unknown system as: Zeros $=$ Poles $- 1$. 
-The fitted models were then plotted using the compare function as can be seen in the Figure \ref{fig:pwm1_comparison} and Figure \ref{pwm2_comparison} below.
+The fitted models were then plotted using the compare function as can be seen in the figures below.
 
 
 
@@ -180,14 +180,14 @@ Figure \ref{fig:pwm2_comparison} displays the physical data for a step input on 
 $32^\circ\text{C}$ and yields a fit of 95.5\% whereas $G_{12}$ yields a fit of 93\% and settles at approximately $\Delta 23^\circ\text{C}$. Notably, $G_{12}$ settles at a slightly higher temperature change compared to the matching physical data, while
 $G_{22}$ converges to the exact steady-state value of its measured counterpart.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{Images/PWM1Step_TestData.pdf} 
     \caption{Comparison of the physical sensor data for a 50\% duty cycle test case against the simulated SIMO transfer function model for PWM 1.}
     \label{fig:pwm1_test}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{Images/PWM2Step_TestData.pdf} 
     \caption{Comparison of the physical sensor data for a 50\% duty cycle test case against the simulated SIMO transfer function model for PWM 2.}
