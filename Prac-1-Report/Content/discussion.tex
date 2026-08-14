@@ -1,9 +1,11 @@
 \section{Discussion}
 \subsection{Model validation}
+\subsubsection{Accuracy metric}
 The built-in \textbf{compare} function in MATLAB was used to determine the model accuracy. This function utilises the normalised
 root mean square error (NRMSE) fitness metric. \cite{mathworks_compare} \ref{eq:nrmse} NRMSE was selected mainly due to the advantage it has when
 comparing different models with different scales.\cite{khoshvaght2025critical} In this system $G_{11}$ converges to approximately $\Delta 50^\circ\text{C}$ whereas
 the simulated response for $G_{12}$ using the validation data set converges to approximately $\Delta 11^\circ\text{C}$. To accurately validate the model
 the scales need to be normalised since a change of $2^\circ\text{C}$ for an amplitude of $11^\circ\text{C}$ is a  bigger error than it is for an amplitude of $50^\circ\text{C}$.
+\subsubsection{Model accuracy}
 
 

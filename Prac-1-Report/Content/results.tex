@@ -125,7 +125,7 @@ The following table contains these two matrices.
 
 \textbf{Comment on the table}
 
-\subsection{Process Reaction Curve Method}
+\subsubsection{Process Reaction Curve Method}
 Figures~\ref{fig:pwm1_reaction} and \ref{fig:pwm2_reaction} show the reaction
 curves obtained from the PWM1 and PWM2 step tests respectively. The tangent line
 at the point of maximum slope is drawn for each channel, with markers indicating
@@ -146,9 +146,22 @@ $t_1$ (tangent intersects $y_0$) and $t_2$ (tangent intersects $y_\infty$).
 \end{figure}
 
 \clearpage
+Figures \ref{fig:prc1} and \ref{fig:prc2} showcases the models accuracy using test data obtained by applying a 50\% duty cycle PWM
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/PRC1_test.pdf}
+    \caption{Simulated Process reaction curve model $G_{11}$(top) and $G_{21}$(bottom) using a 50\% duty cycle as input.}
+    \label{fig:prc1}
+\end{figure}
 
-\subsubsection{Derived FOPDT Transfer Functions}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Images/PRC2_test.pdf}
+    \caption{Simulated Process reaction curve model $G_{22}$(bottom) and $G_{12}$(top) using a 50\% duty cycle as input.}
+    \label{fig:prc2}
+\end{figure}
+
 
 \subsubsection{Variables Derived from Process Reaction Curves}
 
@@ -349,3 +362,4 @@ Figures \ref{fig:pwm1_test} and \ref{fig:pwm2_test} display the same simulated m
 The duty cycle for both PWM1 and PWM2 was dropped to 50\%. The simulated responses of $G_{11}$ and $G_{21}$ (Figure \ref{fig:pwm1_test}) track the measured data to steady-state amplitudes of $\Delta 24^\circ\text{C}$ and $\Delta 16^\circ\text{C}$, 
 yielding fits of 83.7\%  and 76.3\% respectively. Both simulated models converge to a lower steady-state value when compared to their measured counterparts. Figure \ref{fig:pwm2_test} contains the simulated responses of $G_{12}$ (top) and $G_{22}$ (bottom). These responses converge to 
 approximately the same value as their measured counterparts ($\Delta 11^\circ\text{C}$ for $G_{12}$ and $\Delta 16^\circ\text{C}$ for $G_{22}$) and yielded fits of 82.1\% and 83.9\% respectively.
+
