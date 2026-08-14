@@ -73,19 +73,19 @@ simo_transfer1.Name = 'Simulated Model';
 figure(1)
 compare(tfest_data1, simo_transfer1);
 legend('Location', 'best');
-ylabel('Change in Temperature (℃)')
+ylabel('Change in Temperature (C)')
 figure(2)
 compare(tfest_data2, simo_transfer2);
 legend('Location', 'best');
-ylabel('Change in Temperature (℃)')
+ylabel('Change in Temperature (C)')
 figure(3)
 compare(testData1, simo_transfer1);
 legend('Location', 'best');
-ylabel('Change in Temperature (℃)')
+ylabel('Change in Temperature (C)')
 figure(4)
 compare(testData2, simo_transfer2);
 legend('Location', 'best');
-ylabel('Change in Temperature (℃)')
+ylabel('Change in Temperature (C)')
 
 lines = findobj(gcf, 'Type', 'Line');
 set(lines, 'LineWidth', 1.5);
