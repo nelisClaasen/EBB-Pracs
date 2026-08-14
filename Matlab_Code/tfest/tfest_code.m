@@ -2,16 +2,16 @@
 
 %Package the input arrays of both transistors into one matrix (Needs to be
 %columns)
-PWM1StepV1Data = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM1_V0.csv');
+PWM1StepV1Data = readmatrix('..\Data1\Step_PWM1_V0.csv');
 PWM1StepV1 = PWM1StepV1Data(7920:end,1:5);
 
-PWM2StepV0Data = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM2_V0.csv');
+PWM2StepV0Data = readmatrix('..\Data1\Step_PWM2_V0.csv');
 PWM2StepV0 = PWM2StepV0Data(6400:end,1:5);
 
-PWM1TestDataFile = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM1_VtestData50.csv');
+PWM1TestDataFile = readmatrix('..\Data1\Step_PWM1_VtestData50.csv');
 PWM1TestData = PWM1TestDataFile(6230:end,1:5);
 
-PWM2TestDataFile = readmatrix('C:\Universiteit\git\GitHub\EBB-Pracs\Matlab_Code\Data1\Step_PWM2_VtestData50.csv');
+PWM2TestDataFile = readmatrix('..\Data1\Step_PWM2_VtestData50.csv');
 PWM2TestData = PWM2TestDataFile(6160:end,1:5);
 
 %pwm1 data prep
@@ -55,23 +55,69 @@ n_poles = [2; 2];
 n_zeors = [1;1];
 
 %estimate the transfer functions
-mimo_transfer1 = tfest(tfest_data1,n_poles,n_zeors);
-mimo_transfer2 = tfest(tfest_data2, n_poles, n_zeors);
+simo_transfer1 = tfest(tfest_data1,n_poles,n_zeors);
+simo_transfer2 = tfest(tfest_data2, n_poles, n_zeors);
 
 
-v11output = mimo_transfer1(1,1);
-v12output = mimo_transfer2(1,1);
-v21output = mimo_transfer1(2,1);
-v22output = mimo_transfer2(2,1);
-%bode(v2output)
+%set up graph details
+tfest_data1.Name = 'Measured Data';
+tfest_data2.Name = 'Measured Data';
+testData1.Name = 'Measured Data';
+testData2.Name = 'Measured Data';
+
+simo_transfer2.Name = 'Simulated Model';
+simo_transfer1.Name = 'Simulated Model';
 
 
 
 figure(1)
-compare(tfest_data1, mimo_transfer1);
+compare(tfest_data1, simo_transfer1);
+legend('Location', 'best');
+ylabel('Change in Temperature (℃)')
 figure(2)
-compare(tfest_data2, mimo_transfer2);
+compare(tfest_data2, simo_transfer2);
+legend('Location', 'best');
+ylabel('Change in Temperature (℃)')
 figure(3)
-compare(testData1, mimo_transfer1);
+compare(testData1, simo_transfer1);
+legend('Location', 'best');
+ylabel('Change in Temperature (℃)')
 figure(4)
-compare(testData2, mimo_transfer2);
+compare(testData2, simo_transfer2);
+legend('Location', 'best');
+ylabel('Change in Temperature (℃)')
+
+lines = findobj(gcf, 'Type', 'Line');
+set(lines, 'LineWidth', 1.5);
+
+%display the transfer functions of PWM1
+[num1, den1] = tfdata(simo_transfer1(1, 1), 'v');
+
+
+[num2, den2] = tfdata(simo_transfer1(2, 1), 'v');
+
+
+disp('--- Transfer Function 1 (PWM1 to T1) ---');
+disp('Numerator:'); disp(num1);
+disp('Denominator:'); disp(den1);
+
+disp('--- Transfer Function 2 (PWM1 to T2) ---');
+disp('Numerator:'); disp(num2);
+disp('Denominator:'); disp(den2);
+
+
+
+%display transfer functions of PWM2
+[num12, den12] = tfdata(simo_transfer2(1, 1), 'v');
+
+
+[num22, den22] = tfdata(simo_transfer2(2, 1), 'v');
+
+
+disp('--- Transfer Function 1 (PWM2 to T1) ---');
+disp('Numerator:'); disp(num12);
+disp('Denominator:'); disp(den12);
+
+disp('--- Transfer Function 2 (PWM2 to T2) ---');
+disp('Numerator:'); disp(num22);
+disp('Denominator:'); disp(den22);

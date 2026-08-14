@@ -1,1 +1,178 @@
 \section{Results}
+
+\subsection{Step Test Data Acquired from System}
+
+\subsubsection*{System Identification Process}
+
+System identification (SID) is a data-driven modelling approach: rather
+than deriving a transfer function from the underlying physics of the
+transistor--heat-sink--sensor system (a ``white box'' approach), the model
+is instead inferred directly from measured input-output data (a
+``black box'' approach). This is well suited to this practical, since the
+thermal dynamics of the physical setup (heat generation in the transistor,
+conduction through the heat sink, convective losses to the surrounding
+air) are not trivial to derive analytically to the accuracy required.
+ 
+\begin{equation}
+    G_{ij} = \frac{K_{ij}}{\tau_{ij}s+1}e^{-\theta_{ij}s},
+    \label{eq:fopdt}
+\end{equation}
+ 
+The SID process followed in this practical can be summarised as:
+(1)~experiment and data collection, in which a known input is applied to
+the system and the resulting output is recorded; (2)~selection of a model
+structure, fixed for this practical as the first-order-plus-dead-time
+(FOPDT) form given in Equation~\eqref{eq:fopdt}; (3)~fitting the model
+structure to the collected data, performed using two independent methods
+-- the process reaction curve method and MATLAB's transfer function
+estimation tools; and (4)~validating the fitted model against data that
+played no part in the fitting process.
+
+\subsubsection*{Testing vs.\ Validation}
+
+Test data is the input-output data actually used to calculate the model parameters, in this case, the
+step-response data used to extract $\theta$, $\tau$ and $K$ for each
+element of the transfer function matrix. Validation data, by contrast, is
+an entirely separate dataset, never used during fitting, that is used
+afterwards to assess how accurately the fitted model predicts the
+behaviour of the real system.
+ 
+This distinction matters because a model's accuracy on the data it was
+fitted to is not a reliable indicator of its real-world performance: since
+the parameters were explicitly chosen to match that data, evaluating
+accuracy on it would overstate the quality of the fit. Validation on
+independent data gives a fair, unbiased test of the model's ability to
+generalise to inputs it has not seen.
+
+\subsubsection*{Division of Test and Validation Data}
+
+For each input channel, two independent step-test datasets were acquired.
+The test (fitting) dataset was recorded with the relevant PWM channel
+stepped to approximately 97--100\% duty cycle, and was used exclusively to
+derive the FOPDT parameters ($\theta$, $\tau$, $K$) via both the process
+reaction curve method and MATLAB transfer function fitting. The validation
+dataset was recorded in a separate acquisition session and steps the same
+channel to a substantially different operating point of 50\% duty cycle,
+before being held for the remainder of the recording.
+
+This separation satisfies the independence requirement in two respects.
+First, the validation data was captured in a distinct recording session
+from the test data, so no samples are shared between the two sets.
+Second, and more importantly, the validation step targets a different duty
+cycle than the one used for fitting; since the fitted models were never
+exposed to system behaviour at this operating point, their performance on
+the validation data is a genuine test of how well the linear FOPDT
+approximation generalises across the input range, rather than a measure of
+how well the model memorises the specific step it was fitted to.
+
+\subsection{Derived FOPDT transfer functions}
+The transfer functions of the system were derived using two different methods, namely the process reaction curve method and transfer function fitting using MATLAB. Each method
+yielded a MIMO transfer function matrix with the following mathematical description:
+
+\begin{equation}
+    \begin{bmatrix}
+        Y_1(s) \\
+        Y_2(s)
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        G_{11}(s) & G_{12}(s) \\
+        G_{21}(s) & G_{22}(s)
+    \end{bmatrix}
+    \begin{bmatrix}
+        U_1(s) \\
+        U_2(s)
+    \end{bmatrix}
+\end{equation}
+
+The following table contains these two matrices.
+
+\begin{table}[htbp]
+    \centering
+    % Increases the vertical space so the fractions don't squash together
+    \renewcommand{\arraystretch}{2.5} 
+    \caption{Comparison of Transfer Functions: Transfer Function Fitting vs. Process Reaction Curve}
+    \label{tab:transfer_function_comparison}
+    \begin{tabular}{lcc}
+        \hline
+        \textbf{Thermal Pathway} & \textbf{Transfer Function Fitting (\texttt{tfest})} & \textbf{Process Reaction Curve} \\
+        \hline
+        
+        % Row 1: G11 (PWM1 to T1)
+        $G_{11}(s)$ (PWM 1 $\rightarrow$ T1) & 
+        $\frac{-0.1974s + 0.05300}{s^2 + 0.4582s + 0.0034}$ & 
+        $\frac{K_{11}}{\tau_{11} s + 1} e^{-\theta_{11} s}$ \\
+        
+        % Row 2: G12 (PWM2 to T1)
+        $G_{12}(s)$ (PWM 2 $\rightarrow$ T1) & 
+        $\frac{-0.0156 s + 0.0010}{s^2 + 0.0300 s + 0.0002}$ & 
+        $\frac{K_{12}}{\tau_{12} s + 1} e^{-\theta_{12} s}$ \\
+        
+        % Row 3: G21 (PWM1 to T2)
+        $G_{21}(s)$ (PWM 1 $\rightarrow$ T2) & 
+        $\frac{-0.0097 s + 0.0016}{s^2 + 0.0268 s + 0.0002}$ & 
+        $\frac{K_{21}}{\tau_{21} s + 1} e^{-\theta_{21} s}$ \\
+        
+        % Row 4: G22 (PWM2 to T2)
+        $G_{22}(s)$ (PWM 2 $\rightarrow$ T2) & 
+        $\frac{-0.0346 s + 0.0234}{s^2 + 0.3998 s + 0.0024}$ & 
+        $\frac{K_{22}}{\tau_{22} s + 1} e^{-\theta_{22} s}$ \\
+        
+        \hline
+    \end{tabular}
+\end{table}
+
+
+\textbf{Comment on the table}
+
+\subsection{Matlab fitting}
+The \textbf{tfest} function was used in Matlab to fit the data to a transfer function. The following steps were followed to achieve this:
+\\
+\\
+\textbf{Data Preparation:}
+\\
+The recorded data was sliced to include a sufficient amount of zero inputs, this is required by the tfest function to properly fit the model. After which the data was broken into a voltage vector (the PWM input), and two temperature vectors 
+(temperatures of each of the transistors). The ambient temperature was subtracted from  the temperature vectors and the data was packaged into an iddata object.
+\\
+\\
+\textbf{Model Fitting:}
+\\
+Three parameters were passed to the tfest function, namely: the iddata object, the number of poles the system has, and the number of zeros the system has.
+The number of poles a system has is determined by the number of energy storing elements, in the case of this system the transistors are storing energy in the form
+of heat, thus the system has two poles. It is common practise to take the number of zeros of an unknown system as: Zeros $=$ Poles $- 1$. 
+The fitted models were then plotted using the compare function as can be seen in the Figure \ref{fig:pwm1_comparison} and Figure \ref{pwm2_comparison} below.
+
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/PWM1Step_Compare.pdf} 
+    \caption{Comparison of the physical sensor data against the simulated SIMO transfer function model for PWM 1.}
+    \label{fig:pwm1_comparison}
+\end{figure}
+
+Figure \ref{fig:pwm1_comparison} displays the fitted model for both $G_{11}$ (top) and $G_{21}$ (bottom) which are similarly accurate; 94.1\% and 94.4\%, on top
+of the measured physical data.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/PWM2Step_Compare.pdf} 
+    \caption{Comparison of the physical sensor data against the simulated SIMO transfer function model for PWM 2.}
+    \label{fig:pwm2_comparison}
+\end{figure}
+
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/PWM1Step_TestData.pdf} 
+    \caption{Comparison of the physical sensor data for a 50\% duty cycle test case against the simulated SIMO transfer function model for PWM 1.}
+    \label{fig:pwm1_test}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/PWM2Step_TestData.pdf} 
+    \caption{Comparison of the physical sensor data for a 50\% duty cycle test case against the simulated SIMO transfer function model for PWM 2.}
+    \label{fig:pwm2_test}
+\end{figure}

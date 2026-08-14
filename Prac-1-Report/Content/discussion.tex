@@ -1,12 +1,6 @@
 \section{Discussion}
-\subsection{Derived FOPDT transfer functions.}
-\subsubsection{Matlab fitting}
-The \textbf{tfest} function was used in Matlab to fit the data to a transfer function. The following steps were followed to achieve this:
-\\
-\\
-\textbf{Data Preparation:}
-\\
-The recorded data was broken into a voltage vector, which was the PWM input, and two temperature vectors, 
-the temperatures of each of the transistors. This data was then packaged into an iddata obeject.
+\subsection{Model validation}
+The built-in \textbf{compare} function in MATLAB was used to determine the model accuracy. This function utilises the normalised
+root mean square error (NRMSE) fitness metric. 
 
 
