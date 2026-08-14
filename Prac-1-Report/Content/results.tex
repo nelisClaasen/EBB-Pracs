@@ -283,11 +283,25 @@ The \textbf{tfest} function was used in Matlab to fit the data to a transfer fun
 \textbf{Data Preparation:}
 \\
 The recorded data was sliced to include a sufficient amount of zero inputs, this is required by the tfest function to properly fit the model. After which the data was broken into a voltage vector (the PWM input), and two temperature vectors 
-(temperatures of each of the transistors). The ambient temperature was subtracted from  the temperature vectors and the data was packaged into an iddata object.
-\\
+(temperatures of each of the transistors). The ambient temperature was subtracted from  the temperature vectors and the data was packaged into an iddata object. The table below showcases the temperatures that were subtracted from each graph.
+\begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.3} % Adds a bit of vertical padding to the rows
+    \caption{Recorded Ambient Temperatures Subtracted for Data Normalization}
+    \label{tab:ambient_temperatures}
+    \begin{tabular}{lcc}
+        \hline
+        \textbf{Dataset} & \textbf{Sensor 1 Ambient ($T_{1,0}$)} & \textbf{Sensor 2 Ambient ($T_{2,0}$)} \\
+        \hline
+        PWM 1 Step (Estimation) & 22.3 $^\circ$C & 21.2 $^\circ$C \\
+        PWM 2 Step (Estimation) & 20.3 $^\circ$C & 19.1 $^\circ$C \\
+        PWM 1 Step (Validation) & 21.2 $^\circ$C & 20.2 $^\circ$C \\
+        PWM 2 Step (Validation) & 21.1 $^\circ$C & 20.2 $^\circ$C \\
+        \hline
+    \end{tabular}
+\end{table}
 \\
 \textbf{Model Fitting:}
-\\
 Three parameters were passed to the tfest function, namely: the iddata object, the number of poles the system has, and the number of zeros the system has.
 The number of poles a system has is determined by the number of energy storing elements, in the case of this system the transistors are storing energy in the form
 of heat, thus the system has two poles. It is common practise to take the number of zeros of an unknown system as: Zeros $=$ Poles $- 1$. 
@@ -302,8 +316,9 @@ The fitted models were then plotted using the compare function as can be seen in
     \label{fig:pwm1_comparison}
 \end{figure}
 
-Figure \ref{fig:pwm1_comparison} displays the fitted model for both $G_{11}$ (top) and $G_{21}$ (bottom) which are similarly accurate; 94.1\% and 94.4\%, on top
-of the measured physical data.
+Figure \ref{fig:pwm1_comparison} displays the simulated responses for both $G_{11}$ (top) and $G_{21}$ (bottom) overlaid against the measured physical data, yielding fits of 94.1\% and 94.4\%, respectively.
+ $G_{11}$ reaches steady state temperature change of approximately $50^\circ\text{C}$, while $G_{21}$ settles at approximately $33^\circ\text{C}$. Both simulated responses
+converge to the same steady-state values as their  measured data counterparts.
 
 \begin{figure}[H]
     \centering
@@ -312,7 +327,9 @@ of the measured physical data.
     \label{fig:pwm2_comparison}
 \end{figure}
 
-
+Figure \ref{fig:pwm2_comparison} displays the physical data for a step input on PWM 2, overlaid against the simulated responses for both $G_{12}$ (top) and $G_{22}$ (bottom). The simulated response for $G_{22}$ reaches a steady-state temperature change of approximately 
+$32^\circ\text{C}$ and yields a fit of 95.5\% whereas $G_{12}$ yields a fit of 93\% and settles at approximately $\Delta 23^\circ\text{C}$. Notably, $G_{12}$ settles at a slightly higher temperature change compared to the matching physical data, while
+$G_{22}$ converges to the exact steady-state value of its measured counterpart.
 
 \begin{figure}[H]
     \centering
@@ -327,3 +344,8 @@ of the measured physical data.
     \caption{Comparison of the physical sensor data for a 50\% duty cycle test case against the simulated SIMO transfer function model for PWM 2.}
     \label{fig:pwm2_test}
 \end{figure}
+
+Figures \ref{fig:pwm1_test} and \ref{fig:pwm2_test} display the same simulated models as in Figure \ref{fig:pwm1_comparison} and Figure \ref{fig:pwm2_comparison} respectively; however, a different validation dataset was used.
+The duty cycle for both PWM1 and PWM2 was dropped to 50\%. The simulated responses of $G_{11}$ and $G_{21}$ (Figure \ref{fig:pwm1_test}) track the measured data to steady-state amplitudes of $\Delta 24^\circ\text{C}$ and $\Delta 16^\circ\text{C}$, 
+yielding fits of 83.7\%  and 76.3\% respectively. Both simulated models converge to a lower steady-state value when compared to their measured counterparts. Figure \ref{fig:pwm2_test} contains the simulated responses of $G_{12}$ (top) and $G_{22}$ (bottom). These responses converge to 
+approximately the same value as their measured counterparts ($\Delta 11^\circ\text{C}$ for $G_{12}$ and $\Delta 16^\circ\text{C}$ for $G_{22}$) and yielded fits of 82.1\% and 83.9\% respectively.

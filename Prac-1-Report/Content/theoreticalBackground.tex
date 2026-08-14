@@ -1,1 +1,10 @@
 \section{Theoretical Background}
+
+The accuracy of the estimated transfer function models was evaluated using the Normalized Root Mean Square Error (NRMSE) fit percentage. This metric quantifies how well the simulated model response matches the measured physical data, and is defined as:
+
+\begin{equation}
+    \text{Fit (\%)} = 100 \times \left( 1 - \frac{\lVert y - \hat{y} \rVert}{\lVert y - \bar{y} \rVert} \right)
+    \label{eq:nrmse}
+\end{equation}
+
+where $y$ is the measured output data, $\hat{y}$ is the simulated model output, $\bar{y}$ is the mean of the measured output data, and $\lVert \cdot \rVert$ denotes the Euclidean norm.
