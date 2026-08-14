@@ -1,5 +1,70 @@
 \section{Results}
 
+\subsection{Step Test Data Acquired from System}
+
+\subsubsection*{System Identification Process}
+
+System identification (SID) is a data-driven modelling approach: rather
+than deriving a transfer function from the underlying physics of the
+transistor--heat-sink--sensor system (a ``white box'' approach), the model
+is instead inferred directly from measured input-output data (a
+``black box'' approach). This is well suited to this practical, since the
+thermal dynamics of the physical setup (heat generation in the transistor,
+conduction through the heat sink, convective losses to the surrounding
+air) are not trivial to derive analytically to the accuracy required.
+ 
+\begin{equation}
+    G_{ij} = \frac{K_{ij}}{\tau_{ij}s+1}e^{-\theta_{ij}s},
+    \label{eq:fopdt}
+\end{equation}
+ 
+The SID process followed in this practical can be summarised as:
+(1)~experiment and data collection, in which a known input is applied to
+the system and the resulting output is recorded; (2)~selection of a model
+structure, fixed for this practical as the first-order-plus-dead-time
+(FOPDT) form given in Equation~\eqref{eq:fopdt}; (3)~fitting the model
+structure to the collected data, performed using two independent methods
+-- the process reaction curve method and MATLAB's transfer function
+estimation tools; and (4)~validating the fitted model against data that
+played no part in the fitting process.
+
+\subsubsection*{Testing vs.\ Validation}
+
+Test data is the input-output data actually used to calculate the model parameters, in this case, the
+step-response data used to extract $\theta$, $\tau$ and $K$ for each
+element of the transfer function matrix. Validation data, by contrast, is
+an entirely separate dataset, never used during fitting, that is used
+afterwards to assess how accurately the fitted model predicts the
+behaviour of the real system.
+ 
+This distinction matters because a model's accuracy on the data it was
+fitted to is not a reliable indicator of its real-world performance: since
+the parameters were explicitly chosen to match that data, evaluating
+accuracy on it would overstate the quality of the fit. Validation on
+independent data gives a fair, unbiased test of the model's ability to
+generalise to inputs it has not seen.
+
+\subsubsection*{Division of Test and Validation Data}
+
+For each input channel, two independent step-test datasets were acquired.
+The test (fitting) dataset was recorded with the relevant PWM channel
+stepped to approximately 97--100\% duty cycle, and was used exclusively to
+derive the FOPDT parameters ($\theta$, $\tau$, $K$) via both the process
+reaction curve method and MATLAB transfer function fitting. The validation
+dataset was recorded in a separate acquisition session and steps the same
+channel to a substantially different operating point of 50\% duty cycle,
+before being held for the remainder of the recording.
+
+This separation satisfies the independence requirement in two respects.
+First, the validation data was captured in a distinct recording session
+from the test data, so no samples are shared between the two sets.
+Second, and more importantly, the validation step targets a different duty
+cycle than the one used for fitting; since the fitted models were never
+exposed to system behaviour at this operating point, their performance on
+the validation data is a genuine test of how well the linear FOPDT
+approximation generalises across the input range, rather than a measure of
+how well the model memorises the specific step it was fitted to.
+
 \subsection{Derived FOPDT transfer functions}
 The transfer functions of the system were derived using two different methods, namely the process reaction curve method and transfer function fitting using MATLAB. Each method
 yielded a MIMO transfer function matrix with the following mathematical description:
