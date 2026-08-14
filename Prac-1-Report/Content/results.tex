@@ -123,7 +123,8 @@ The following table contains these two matrices.
 \end{table}
 
 
-\textbf{Comment on the table}
+Table \ref{tab:transfer_function_comparison} compares the transfer functions that were derived using the two different methods.
+It is noted that the transfer function fitting method was not restricted to a first order system unlike the Process Reaction Curve method.
 
 \subsubsection{Process Reaction Curve Method}
 Figures~\ref{fig:pwm1_reaction} and \ref{fig:pwm2_reaction} show the reaction
@@ -363,3 +364,23 @@ The duty cycle for both PWM1 and PWM2 was dropped to 50\%. The simulated respons
 yielding fits of 83.7\%  and 76.3\% respectively. Both simulated models converge to a lower steady-state value when compared to their measured counterparts. Figure \ref{fig:pwm2_test} contains the simulated responses of $G_{12}$ (top) and $G_{22}$ (bottom). These responses converge to 
 approximately the same value as their measured counterparts ($\Delta 11^\circ\text{C}$ for $G_{12}$ and $\Delta 16^\circ\text{C}$ for $G_{22}$) and yielded fits of 82.1\% and 83.9\% respectively.
 
+\subsubsection{Summary of Validation Data}
+
+Table \ref{tab:nrmse_comparison} compares the NRMSE fit percentages between the MATLAB and PRC models using the validation dataset.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.3} % Adds vertical padding for readability
+    \caption{Comparison of NRMSE Fit Percentages: MATLAB vs. Process Reaction Curve (Validation Data)}
+    \label{tab:nrmse_comparison}
+    \begin{tabular}{lccc}
+        \hline
+        \textbf{Transfer Function} & \textbf{MATLAB \texttt{tfest} (\%)} & \textbf{PRC (\%)} & \textbf{Difference (\%)} \\
+        \hline
+        $G_{11}$ (PWM 1 $\rightarrow$ T1) & 83.7 & 78.0 & +5.7 \\
+        $G_{21}$ (PWM 1 $\rightarrow$ T2) & 76.3 & 29.4 & +46.9 \\
+        $G_{12}$ (PWM 2 $\rightarrow$ T1) & 82.1 & 73.8 & +8.3 \\
+        $G_{22}$ (PWM 2 $\rightarrow$ T2) & 83.9 & 79.7 & +4.2 \\
+        \hline
+    \end{tabular}
+\end{table}

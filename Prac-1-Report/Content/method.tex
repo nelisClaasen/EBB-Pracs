@@ -80,7 +80,7 @@ transfer function in the third section of this report.
 
 Because the ESP32 operates its GPIO logic at 3.3\,V, the base resistor
 values were selected according to the 3.3\,V column of Table~1 in the
-practical guide: $R_1 = 270\ \Omega$ and $R_2 = 560\ \Omega$. These
+practical guide\cite{key}: $R_1 = 270\ \Omega$ and $R_2 = 560\ \Omega$. These
 resistors were chosen to limit the base current drawn from the ESP32 GPIO
 pin to a safe level while still supplying enough current to fully switch
 the TIP31C on, given the fixed 5\,V bench-supply rail feeding the collector.
@@ -108,7 +108,7 @@ consistent reference voltage across the system.
 
 The MCP9700 does not output a digital temperature value; it is a purely
 analogue device whose output voltage varies linearly with the temperature. Microchip characterises this relationship
-in the datasheet as a first-order (linear) transfer function:
+in the datasheet as a first-order (linear) transfer function \cite{mcp9700}:
 \begin{equation}
     V_{OUT} = T_C \cdot T_A + V_{0^{\circ}C}
     \label{eq:sensor_transfer}
