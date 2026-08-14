@@ -6,6 +6,17 @@ root mean square error (NRMSE) fitness metric. \cite{mathworks_compare} \ref{eq:
 comparing different models with different scales.\cite{khoshvaght2025critical} In this system $G_{11}$ converges to approximately $\Delta 50^\circ\text{C}$ whereas
 the simulated response for $G_{12}$ using the validation data set converges to approximately $\Delta 11^\circ\text{C}$. To accurately validate the model
 the scales need to be normalised since a change of $2^\circ\text{C}$ for an amplitude of $11^\circ\text{C}$ is a  bigger error than it is for an amplitude of $50^\circ\text{C}$.
-\subsubsection{Model accuracy}
+\subsubsection{Model accuracy and Tranfer function comparisons}
+Comparing the validation responses in Figures \ref{fig:pwm1_test} and \ref{fig:pwm2_test} to the Process Reaction Curve (PRC) models in Figures \ref{fig:prc1} and \ref{fig:prc2}, it is clear that the MATLAB transfer functions 
+are much more accurate. The \texttt{tfest} models consistently resulted in higher NRMSE fit percentages for both the primary and cross-talk heating pathways.
+\\
+\\
+This difference makes sense based on how each model is calculated. MATLAB uses numerical optimization to find the best mathematical fit by looking at the entire dataset 
+at once. On the other hand, the PRC method relies on drawing a single tangent line at the steepest part of the measured curve. Because of this, the PRC method is very sensitive to 
+measurement noise and human error.
+\\
+\\
+Finally, the PRC method forces the model into a basic First-Order Plus Dead Time (FOPDT) structure. The MATLAB models, however, were set up using two poles and one zero. This higher-order structure gave 
+MATLAB the mathematical flexibility it needed to accurately track the initial curves and changing dynamics of the thermal system, which a simple first-order model just ignores.
 
 
