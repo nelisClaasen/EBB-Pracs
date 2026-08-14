@@ -35,9 +35,7 @@ Temp_PWM2_test = [PWM2TestData(:,1)-21.1, PWM2TestData(:,2)-20.2] ;
 
 
 
-%input_v1 = timeseries(V(1),PWM1StepV1(:,5));
-% Prepare the input timeseries for the second transistor
-%input_v2 = timeseries(V(2), PWM1StepV1(:,5));
+
 
 %use iddata to set up the data for tfest
 
