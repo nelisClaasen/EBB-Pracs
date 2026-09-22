@@ -17,6 +17,14 @@ bool start = 0; //Start off.
 int message = 100; //Flags for certain messages.
 int start_time = 0;
 
+//PID variables 
+float error = 0;
+float integral = 0;
+float previous_error = 0;
+float derivative = 0;
+bool do_integration = true;
+
+
 double temp1 = 0;
 double temp2 = 0;
 int N_samples = 200;
@@ -188,8 +196,26 @@ void loop() {
       delayMicroseconds(sampling_period);
       message = 0; //Set message flag for sampling too fast.
     }
-  }
+    //PID controller start
+    previous_error = error;
+    error = setpoint - temp1;
+
+    if (do_integration){
+    integral += (integral + error)*sampling_period;
+    }
+    derivative = (error - previous_error)/sampling_period;
+    //anti-windup logic
+    if  (P * error + I*integral + D*derivative >= 99 )
+    {
+      do_integration = false;
+      duty = 99;
+    }
+    else{
+      duty = P * error + I*integral + D*derivative;
+      do_integration = true;
+    }
   //Otherwise deactivate PWM outputs.
+  }
   else
   {
     ledcWrite(0, 0);
