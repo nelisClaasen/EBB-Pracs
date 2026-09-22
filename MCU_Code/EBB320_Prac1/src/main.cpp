@@ -137,7 +137,7 @@ void loop() {
 
     //Turn on the appropriate PWM signals.
       ledcWrite(0, duty);
-      ledcWrite(1, 0);
+      ledcWrite(1, disturbance);
 
     //Interpret sensor data.
     double temp1_raw = (analogReadMilliVolts(Temp_Meas1)/1000.0 - 0.5)/0.01;
@@ -177,10 +177,10 @@ void loop() {
 
     float pid_out = P * error + I*integral + D*derivative;
     //anti-windup logic
-    if  (pid_out >= 99 && error > 0 )
+    if  (pid_out >= 3.3 && error > 0 )
     {
       do_integration = false;
-      duty = 99;
+      duty = 100;
       integral = 0;
     }
 
@@ -191,7 +191,7 @@ void loop() {
     }
 
     else{
-      duty = pid_out;
+      duty = (pid_out/3.3) * 100;
       do_integration = true;
     }
     duty = (pow(2, PWM_res) - 1)*(duty/100.0);
