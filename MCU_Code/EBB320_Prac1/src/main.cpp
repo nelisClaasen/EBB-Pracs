@@ -104,6 +104,7 @@ void loop() {
     else if(command == "4")
     {
       disturbance = value;
+      disturbance = (pow(2, PWM_res) - 1)*(disturbance/100.0);
     }
     else if(command == "5")
     {
@@ -135,27 +136,8 @@ void loop() {
     timerRestart(timer);
 
     //Turn on the appropriate PWM signals.
-    switch(control_outputs)
-    {
-      case 0:
-        ledcWrite(0, duty);
-        ledcWrite(1, 0);
-        break;
-
-      case 1:
-        ledcWrite(1, duty);
-        ledcWrite(0, 0);
-        break;
-
-      case 2:
-        ledcWrite(0, duty);
-        ledcWrite(1, duty);
-        break;
-
-        default:
-        ledcWrite(0, 0);
-        ledcWrite(1, 0);
-    }
+      ledcWrite(0, duty);
+      ledcWrite(1, 0);
 
     //Interpret sensor data.
     double temp1_raw = (analogReadMilliVolts(Temp_Meas1)/1000.0 - 0.5)/0.01;
@@ -183,6 +165,37 @@ void loop() {
     Serial.println(String(sending.c_str()));
     Serial.flush();
 
+
+    //PID controller start
+    previous_error = error;
+    error = setpoint - temp1;
+
+    if (do_integration){
+    integral += error *sampling_period;
+    }
+    derivative = (error - previous_error)/sampling_period;
+
+    float pid_out = P * error + I*integral + D*derivative;
+    //anti-windup logic
+    if  (pid_out >= 99 && error > 0 )
+    {
+      do_integration = false;
+      duty = 99;
+      integral = 0;
+    }
+
+    else if (pid_out <= 0.0 && error < 0) {
+    duty = 0.0; // You cannot have a negative duty cycle for a simple heater/cooler
+    do_integration = false;
+    integral = 0;
+    }
+
+    else{
+      duty = pid_out;
+      do_integration = true;
+    }
+    duty = (pow(2, PWM_res) - 1)*(duty/100.0);
+
     //Check how long everything took in microseconds.
     int elapsed = timerReadMicros(timer);
 
@@ -196,32 +209,8 @@ void loop() {
       delayMicroseconds(sampling_period);
       message = 0; //Set message flag for sampling too fast.
     }
-    //PID controller start
-    previous_error = error;
-    error = setpoint - temp1;
 
-    if (do_integration){
-    integral += error *sampling_period;
-    }
-    derivative = (error - previous_error)/sampling_period;
 
-    float pid_out = P * error + I*integral + D*derivative;
-    //anti-windup logic
-    if  (pid_out >= 99 )
-    {
-      do_integration = false;
-      duty = 99;
-    }
-    
-    else if (pid_out <= 0.0) {
-    duty = 0.0;             // You cannot have a negative duty cycle for a simple heater/cooler
-    do_integration = false;
-    }
-
-    else{
-      duty = pid_out;
-      do_integration = true;
-    }
   //Otherwise deactivate PWM outputs.
   }
   else
