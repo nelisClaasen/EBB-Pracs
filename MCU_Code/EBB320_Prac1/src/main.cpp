@@ -201,17 +201,25 @@ void loop() {
     error = setpoint - temp1;
 
     if (do_integration){
-    integral += (integral + error)*sampling_period;
+    integral += error *sampling_period;
     }
     derivative = (error - previous_error)/sampling_period;
+
+    float pid_out = P * error + I*integral + D*derivative;
     //anti-windup logic
-    if  (P * error + I*integral + D*derivative >= 99 )
+    if  (pid_out >= 99 )
     {
       do_integration = false;
       duty = 99;
     }
+    
+    else if (pid_out <= 0.0) {
+    duty = 0.0;             // You cannot have a negative duty cycle for a simple heater/cooler
+    do_integration = false;
+    }
+
     else{
-      duty = P * error + I*integral + D*derivative;
+      duty = pid_out;
       do_integration = true;
     }
   //Otherwise deactivate PWM outputs.
