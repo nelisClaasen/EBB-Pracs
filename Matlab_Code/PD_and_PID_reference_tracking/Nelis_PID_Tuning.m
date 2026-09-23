@@ -24,19 +24,19 @@ tfest_data1 = iddata(Temp_PWM1, V_PWM1, time_step);
 tfest_data2 = iddata(Temp_PWM2, V_PWM2, time_step);
 
 %estimate nr of poles and zeros, 2 poles since there are two transistors
-n_poles = [1; 1];
-n_zeors = [0;0];
+n_poles = 1;
+n_zeros = 0;
 
 %estimate the transfer functions
-simo_transfer1 = tfest(tfest_data1,n_poles,n_zeors);
-simo_transfer2 = tfest(tfest_data2, n_poles, n_zeors);
+simo_transfer1 = tfest(tfest_data1(:, 1, 1), n_poles, n_zeros, NaN); % PWM1 to T1
+simo_transfer2 = tfest(tfest_data2, n_poles, n_zeros);
 
 %create reference tracking PID.
 opts = pidtuneOptions ('DesignFocus', 'reference-tracking');
-[C1_pid, info] = pidtune(simo_transfer1(1), 'PID', opts);
+[C1_pid, info] = pidtune(simo_transfer1, 'PID', opts)
 
 %get closed loop step response.
-PID_ref_tracking = feedback(C1_pid*simo_transfer1(1), 1);
+PID_ref_tracking = feedback(C1_pid*simo_transfer1, 1);
 
 G11 = simo_transfer1(1)
 G12 = simo_transfer2(2)
