@@ -171,34 +171,32 @@ void loop() {
     //PID controller start
     previous_error = error;
     error = setpoint - temp1;
-
-    if (do_integration){
-    integral += error *dt;
-    }
+    float next_integral = integral + error * dt;
+    
     derivative = (error - previous_error)/dt;
 
-    float pid_out = P * error + I*integral + D*derivative;
+    float pid_out = P * error + I*next_integral + D*derivative;
     //anti-windup logic
     if  (pid_out >= 3.3 )
     {
       duty = 100;
-      if ( error > 0){
-      do_integration = false;
+      if ( error < 0){
+      integral = next_integral;
       }
 
     }
 
     else if (pid_out <= 0.0 ) {
     duty = 0.0; // You cannot have a negative duty cycle for a simple heater/cooler
-    if ( error < 0){
-      do_integration = false;
+    if ( error > 0){
+      integral = next_integral;
       }
     
     }
 
     else{
       duty = (pid_out/3.3) * 100;
-      do_integration = true;
+      integral = next_integral;
     }
     duty = (pow(2, PWM_res) - 1)*(duty/100.0);
 
