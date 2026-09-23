@@ -25,6 +25,7 @@ float derivative = 0;
 bool do_integration = true;
 
 
+
 double temp1 = 0;
 double temp2 = 0;
 int N_samples = 200;
@@ -46,6 +47,7 @@ const int PWM_res = 8;
 
 const int BaudRate = 1152000;
 const int sampling_period = 5000; //In microseconds.
+const float dt = sampling_period/1000000.0;
 
 void setup() {
   //Start the USB-C serial/UART port.
@@ -169,30 +171,32 @@ void loop() {
     //PID controller start
     previous_error = error;
     error = setpoint - temp1;
+    float next_integral = integral + error * dt;
+    
+    derivative = (error - previous_error)/dt;
 
-    if (do_integration){
-    integral += error *sampling_period;
-    }
-    derivative = (error - previous_error)/sampling_period;
-
-    float pid_out = P * error + I*integral + D*derivative;
+    float pid_out = P * error + I*next_integral + D*derivative;
     //anti-windup logic
-    if  (pid_out >= 3.3 && error > 0 )
+    if  (pid_out >= 3.3 )
     {
-      do_integration = false;
       duty = 100;
-      integral = 0;
+      if ( error < 0){
+      integral = next_integral;
+      }
+
     }
 
-    else if (pid_out <= 0.0 && error < 0) {
+    else if (pid_out <= 0.0 ) {
     duty = 0.0; // You cannot have a negative duty cycle for a simple heater/cooler
-    do_integration = false;
-    integral = 0;
+    if ( error > 0){
+      integral = next_integral;
+      }
+    
     }
 
     else{
       duty = (pid_out/3.3) * 100;
-      do_integration = true;
+      integral = next_integral;
     }
     duty = (pow(2, PWM_res) - 1)*(duty/100.0);
 
