@@ -213,6 +213,12 @@ void loop() {
       }
       duty = (pow(2, PWM_res) - 1)*(duty/100.0);
     }
+    //Otherwise turn off control signals.
+    else
+    {
+      ledcWrite(0, 0);
+      ledcWrite(1, 0);
+    }
 
     //Check how long everything took in microseconds.
     int elapsed = timerReadMicros(timer);
