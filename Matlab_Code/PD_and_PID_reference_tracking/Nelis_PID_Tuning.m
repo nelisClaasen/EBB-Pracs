@@ -29,7 +29,7 @@ n_zeros = 0;
 
 %estimate the transfer functions
 simo_transfer1 = tfest(tfest_data1(:, 1, 1), n_poles, n_zeros, NaN); % PWM1 to T1
-simo_transfer2 = tfest(tfest_data2, n_poles, n_zeros);
+simo_transfer2 = tfest(tfest_data2(:, 1, 1), n_poles, n_zeros, NaN); % PWM2 to T1
 
 %create reference tracking PID.
 opts = pidtuneOptions ('DesignFocus', 'reference-tracking');
@@ -38,6 +38,6 @@ opts = pidtuneOptions ('DesignFocus', 'reference-tracking');
 %get closed loop step response.
 PID_ref_tracking = feedback(C1_pid*simo_transfer1, 1);
 
-G11 = simo_transfer1(1)
-G12 = simo_transfer2(2)
+G11 = simo_transfer1
+G12 = simo_transfer2
 

@@ -16,6 +16,7 @@ int control_outputs = 0; //By default only pwm1 is on.
 bool start = 0; //Start off.   
 int message = 100; //Flags for certain messages.
 int start_time = 0;
+bool startControlling = 0; //See if we should start controlling, or continue just measuring.
 
 //PID variables 
 float error = 0;
@@ -48,6 +49,7 @@ const int PWM_res = 8;
 const int BaudRate = 1152000;
 const int sampling_period = 5000; //In microseconds.
 const float dt = sampling_period/1000000.0;
+bool first_run = true;
 
 void setup() {
   //Start the USB-C serial/UART port.
@@ -108,10 +110,9 @@ void loop() {
       disturbance = value;
       disturbance = (pow(2, PWM_res) - 1)*(disturbance/100.0);
     }
-    else if(command == "5")
+    else if(command == "5") //Change from duty cycle set to the startControlling flag.
     {
-      duty = value;
-      duty = (pow(2, PWM_res) - 1)*(duty/100.0); //Convert to percentage.
+      startControlling = value;
     }
     else if(command == "6")
     {
@@ -164,41 +165,54 @@ void loop() {
     std::string sending = fmt::format("{0}, {1}, {2}, {3}, {4}, {5}",
     temp1, temp2, analogRead(PWM_Meas_1)*A, analogRead(PWM_Meas_2)*A, millis() - start_time, message);
 
+    // std::string sending = fmt::format("{0}, {1}, {2}", P, I, D);
+
     Serial.println(String(sending.c_str()));
     Serial.flush();
 
 
-    //PID controller start
-    previous_error = error;
-    error = setpoint - temp1;
-    float next_integral = integral + error * dt;
-    
-    derivative = (error - previous_error)/dt;
-
-    float pid_out = P * error + I*next_integral + D*derivative;
-    //anti-windup logic
-    if  (pid_out >= 3.3 )
+    if (startControlling)
     {
-      duty = 100;
-      if ( error < 0){
-      integral = next_integral;
+      //PID controller start
+      previous_error = error;
+      error = setpoint - temp1;
+  
+      // Prevent derivative kick on first run
+  
+      if (first_run) {
+        previous_error = error;
+        first_run = false;
       }
-
-    }
-
-    else if (pid_out <= 0.0 ) {
-    duty = 0.0; // You cannot have a negative duty cycle for a simple heater/cooler
-    if ( error > 0){
-      integral = next_integral;
+  
+      float next_integral = integral + error * dt;
+      
+      derivative = (error - previous_error)/dt;
+  
+      float pid_out = P * error + I*next_integral + D*derivative;
+      //anti-windup logic
+      if  (pid_out >= 3.3 )
+      {
+        duty = 100;
+        if ( error < 0){
+        integral = next_integral;
+        }
+  
       }
-    
+  
+      else if (pid_out <= 0.0 ) {
+      duty = 0.0; // You cannot have a negative duty cycle for a simple heater/cooler
+      if ( error > 0){
+        integral = next_integral;
+        }
+      
+      }
+  
+      else{
+        duty = (pid_out/3.3) * 100;
+        integral = next_integral;
+      }
+      duty = (pow(2, PWM_res) - 1)*(duty/100.0);
     }
-
-    else{
-      duty = (pid_out/3.3) * 100;
-      integral = next_integral;
-    }
-    duty = (pow(2, PWM_res) - 1)*(duty/100.0);
 
     //Check how long everything took in microseconds.
     int elapsed = timerReadMicros(timer);
