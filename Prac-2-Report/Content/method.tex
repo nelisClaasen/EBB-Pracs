@@ -1,1 +1,34 @@
 \section{Software and Hardware Design Implementation}
+\subsection{PD Controller}
+
+\begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
+    Step Response Parameter & Closed Loop & Open Loop \\
+    \hline
+    Overshoot ($\%$) & $8.8047\times 10^{-5}$ & $0.0$ \\
+    Rise Time ($\mathrm{s}$) & $77.3698$ & $251.4783$\\
+    Peak Time ($\mathrm{s}$) & $119.1159$ & $1500$\\
+    Settling Time ($\mathrm{s}$) & $97.0706$ & $446.5085$\\
+\end{tblr}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PD_open_vs_closed_fig.pdf}
+    \caption{Closed Loop vs Open Loop response of PD Controller}
+\end{figure}
+
+\subsection{PID - Reference Tracking Controller}
+
+\begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
+    Step Response Parameter & Closed Loop & Open Loop \\
+    \hline
+    Overshoot ($\%$) & $0.1592$ & $0.0$ \\
+    Rise Time ($\mathrm{s}$) & $123.6591$ & $251.4783$\\
+    Peak Time ($\mathrm{s}$) & $432.7289$ & $1500$\\
+    Settling Time ($\mathrm{s}$) & $220.6166$ & $446.5085$\\
+\end{tblr}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PID_ref_tracking_open_vs_closed_fig.pdf}
+    \caption{Closed Loop vs Open Loop response of PID Reference Tracking Controller}
+\end{figure}

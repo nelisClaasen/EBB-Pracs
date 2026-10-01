@@ -32,14 +32,14 @@ simo_transfer1 = tfest(tfest_data1(:, 1, 1), n_poles, n_zeros, NaN); % PWM1 to T
 simo_transfer2 = tfest(tfest_data2(:, 1, 1), n_poles, n_zeros, NaN); % PWM2 to T1
 
 %create reference tracking PID.
-opts = pidtuneOptions ('DesignFocus', 'reference-tracking');
-[C1_pid, info] = pidtune(simo_transfer1, 'PID', opts)
+opts = pidtuneOptions ('DesignFocus', 'disturbance-rejection');
+[C1_pid, info] = pidtune(simo_transfer1, 'PD')
 
 %get closed loop step response.
 PID_ref_tracking = feedback(C1_pid*simo_transfer1, 1);
 
 G11 = simo_transfer1
-G12 = simo_transfer2
+% G12 = simo_transfer2
 
 toutClosed = out.PD_Closed_Loop.time;
 youtClosed = out.PD_Closed_Loop.signals.values;
