@@ -138,9 +138,12 @@ void loop() {
     //Check when we started in order to see how long we were busy.
     timerRestart(timer);
 
-    //Turn on the appropriate PWM signals.
-      ledcWrite(0, duty);
-      ledcWrite(1, disturbance);
+    if(startControlling)
+    {
+      //Turn on the appropriate PWM signals.
+        ledcWrite(0, duty);
+        ledcWrite(1, disturbance);
+    }
 
     //Interpret sensor data.
     double temp1_raw = (analogReadMilliVolts(Temp_Meas1)/1000.0 - 0.5)/0.01;
@@ -164,8 +167,6 @@ void loop() {
     //Send sensor input data as a comma seperated list.
     std::string sending = fmt::format("{0}, {1}, {2}, {3}, {4}, {5}",
     temp1, temp2, analogRead(PWM_Meas_1)*A, analogRead(PWM_Meas_2)*A, millis() - start_time, message);
-
-    // std::string sending = fmt::format("{0}, {1}, {2}", P, I, D);
 
     Serial.println(String(sending.c_str()));
     Serial.flush();
@@ -192,7 +193,7 @@ void loop() {
       //anti-windup logic
       if  (pid_out >= 3.3 )
       {
-        duty = 100;
+        duty = 1;
         if ( error < 0){
         integral = next_integral;
         }
@@ -208,10 +209,20 @@ void loop() {
       }
   
       else{
-        duty = (pid_out/3.3) * 100;
+        duty = pid_out/3.3;
         integral = next_integral;
       }
-      duty = (pow(2, PWM_res) - 1)*(duty/100.0);
+      duty = (pow(2, PWM_res) - 1)*(duty);
+
+      // std::string sending = fmt::format("{0}, {1}, {2}, {3}, {4}", P, I, D, error, duty);
+      // Serial.println(String(sending.c_str()));
+      // Serial.flush();
+    }
+    //Otherwise turn off control signals.
+    else
+    {
+      ledcWrite(0, 0);
+      ledcWrite(1, 0);
     }
 
     //Check how long everything took in microseconds.
