@@ -8,10 +8,9 @@ The software was developed in C++ and relies on a fixed sample time ($\Delta t$)
 Because the physical plant is constrained by a 0--3.3V operating range mapped to a 0--100\% PWM duty cycle, several engineering protections were implemented in the firmware:
 
 \begin{itemize}
-    \item \textbf{PID output limiting:} The pid_out variable is constrained to the physical limit of the ESP (3.3\,V).
-    \item \textbf{Anti-derivative kick:} The first derivative calculation will spike to infinity causing unpredictable behavior, this is handled by implementing a
-    `first_run' flag variable that sets the previous error equal to the current error when the derivative is calculated for the first time.
-    \item \textbf{Anti_integral windup:} The integral term does not get updated if the system demands an output higher than the ESP's limit and the error is not negative. The inverse case is handled in the same way.
+    \item \textbf{PID output limiting:} The \texttt{pid\_out} variable is constrained to the physical limit of 3.3V.
+    \item \textbf{Anti-derivative kick:} The first derivative calculation will spike to infinity causing unpredictable behavior, this is handled by implementing a \texttt{first\_run} flag variable that sets the previous error equal to the current error when the derivative is calculated for the first time.
+    \item \textbf{Anti-integral windup:} The integral term does not get updated if the system demands an output higher than the ESP's limit and the error is not negative. The inverse case is handled in the same way.
 \end{itemize}
 
 
