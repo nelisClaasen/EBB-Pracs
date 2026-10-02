@@ -12,46 +12,28 @@ C2_pid
 Kp = C2_pid.Kp;
 Ki = C2_pid.Ki;
 Kd = C2_pid.Kd;
-
-% Create a new figure window
 figure('Name', 'Controller Performance', 'Position', [100, 100, 800, 600]);
-
-% --- TOP SUBPLOT: Reference vs. Controlled Variable ---
-subplot(2, 1, 1);
 hold on; grid on;
 % Plot the actual temperature
-plot(out.temp_sig.Time, out.temp_sig.Data, 'b-', 'LineWidth', 1.5);
+plot(out.temp_sig.Time, out.temp_sig.Data, 'b-', 'LineWidth', 1.5, 'DisplayName', 'Temperature Closed Loop');
+
+%Plot the closed loop temp.
+plot(out.open_loop.Time, out.open_loop.Data, 'LineWidth', 1.5, 'DisplayName', 'Temperature Open Loop');
 % Plot the reference
-plot(out.ref_sig.Time, out.ref_sig.Data, 'k--', 'LineWidth', 1.5);
+% plot(out.ref.Time, out.ref.Data, 'k--', 'LineWidth', 1.5, DisplayName='Setpoint');
+yline(50, 'k--', 'DisplayName','Setpoint' , 'LineWidth', 1.5)
 
-
-% Formatting the top plot
-title('System Response: Disturbance Rejection');
+title('System Response: PID Disturbance Rejection No Disturbance');
 ylabel('Temperature (°C)');
-ylim([20, 60])
-legend('Reference Trajectory', 'Controlled Variable (Temperature)', 'Location', 'best');
+xlabel('Time (s)');
+% ylim([20, 60])
+legend('Location', 'best');
 hold off;
 
-% --- BOTTOM SUBPLOT: Manipulated vs. Disturbance Variables ---
-subplot(2, 1, 2);
-hold on; grid on;
+reference_target = 50; 
 
-
-valid_idx = out.volt_sig.Time >= 0.15;
-
-
-plot(out.volt_sig.Time(valid_idx), out.volt_sig.Data(valid_idx), 'r-', 'LineWidth', 1.5);
-
-% Plot the disturbance step normally
-%plot(out.dist_sig.Time, out.dist_sig.Data, 'm-.', 'LineWidth', 1.5);
-
-% Formatting the bottom plot
-xlabel('Time (seconds)');
-ylabel('Amplitude (Volts / Input)');
-legend('Manipulated Variable (Voltage)', 'Disturbance Variable', 'Location', 'best');
-hold off;
-
-% 1. Closed-Loop Metrics (From Simulink Data)
+% Calculate stepinfo using the timeseries data exported from Simulink
+CL_info = stepinfo(out.No_disturb.Data, out.No_disturb.Time, reference_target);
 
 
 
