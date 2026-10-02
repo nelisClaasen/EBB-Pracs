@@ -8,12 +8,69 @@ The software was developed in C++ and relies on a fixed sample time ($\Delta t$)
 Because the physical plant is constrained by a 0--3.3V operating range mapped to a 0--100\% PWM duty cycle, several engineering protections were implemented in the firmware:
 
 \begin{itemize}
-    \item \textbf{PID output limiting:} The pid_out variable is constrained to the physical limit of the ESP (3.3\,V).
-    \item \textbf{Anti-derivative kick:} The first derivative calculation will spike to infinity causing unpredictable behavior, this is handled by implementing a
-    `first_run' flag variable that sets the previous error equal to the current error when the derivative is calculated for the first time.
-    \item \textbf{Anti_integral windup:} The integral term does not get updated if the system demands an output higher than the ESP's limit and the error is not negative. The inverse case is handled in the same way.
+    \item \textbf{PID output limiting:} The \texttt{pid\_out} variable is constrained to the physical limit of 3.3V.
+    \item \textbf{Anti-derivative kick:} The first derivative calculation will spike to infinity causing unpredictable behavior, this is handled by implementing a \texttt{first\_run} flag variable that sets the previous error equal to the current error when the derivative is calculated for the first time.
+    \item \textbf{Anti-integral windup:} The integral term does not get updated if the system demands an output higher than the ESP's limit and the error is not negative. The inverse case is handled in the same way.
 \end{itemize}
 
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.5cm and 2cm,
+        box/.style={rectangle, draw, fill=blue!5, text width=5cm, text centered, rounded corners, minimum height=1cm, font=\footnotesize},
+        decision/.style={diamond, aspect=2, draw, fill=green!5, text width=2.5cm, text centered, font=\footnotesize},
+        line/.style={draw, -Latex, thick}
+    ]
+    
+    % --- Nodes ---
+    \node [box] (start) {\textbf{Start PID Loop}\\ \texttt{if (startControlling)}};
+    
+    \node [box, below=1cm of start] (error) {\textbf{Calculate Error}\\ \texttt{error = setpoint - temp1}};
+    
+    \node [decision, below=1cm of error] (firstrun) {\texttt{first\_run} == true?};
+    
+    \node [box, right=1cm of firstrun, text width=3cm] (fixkick) {Prevent Deriv Kick:\\ \texttt{prev\_error = error}\\ \texttt{first\_run = false}};
+    
+    \node [box, below=1cm of firstrun] (pidmath) {\textbf{Calculate Raw PID}\\ \texttt{next\_integral}, \texttt{derivative}, and \texttt{pid\_out}};
+    
+    \node [decision, below=1cm of pidmath] (limithigh) {\texttt{pid\_out >= 3.3}?};
+    
+    \node [box, right=1.5cm of limithigh, text width=4cm] (sathigh) {\textbf{Saturate High}\\ \texttt{duty = 1}\\ Update \texttt{integral} if \texttt{error < 0}};
+    
+    \node [decision, below=1.5cm of limithigh] (limitlow) {\texttt{pid\_out <= 0.0}?};
+    
+    \node [box, right=1.5cm of limitlow, text width=4cm] (satlow) {\textbf{Saturate Low}\\ \texttt{duty = 0}\\ Update \texttt{integral} if \texttt{error > 0}};
+    
+    \node [box, below=1.5cm of limitlow] (normal) {\textbf{Normal Operation}\\ \texttt{duty = pid\_out / 3.3}\\ \texttt{integral = next\_integral}};
+    
+    \node [box, below=1cm of normal] (pwm) {\textbf{Hardware Mapping}\\ \texttt{duty = (pow(2, PWM\_res) - 1) * duty}};
 
+    % --- Paths / Arrows ---
+    \path [line] (start) -- (error);
+    \path [line] (error) -- (firstrun);
+    
+    \path [line] (firstrun) -- node[above] {Yes} (fixkick);
+    \path [line] (fixkick) |- (pidmath);
+    \path [line] (firstrun) -- node[left] {No} (pidmath);
+    
+    \path [line] (pidmath) -- (limithigh);
+    
+    \path [line] (limithigh) -- node[above] {Yes} (sathigh);
+    \path [line] (limithigh) -- node[left] {No} (limitlow);
+    
+    \path [line] (limitlow) -- node[above] {Yes} (satlow);
+    \path [line] (limitlow) -- node[left] {No} (normal);
+    
+    \path [line] (normal) -- (pwm);
+    
+    % Route the saturation blocks back to the main flow before the PWM mapping
+    \coordinate (join_pwm) at ($(normal.south)!0.5!(pwm.north)$);
+    \path [line] (sathigh.east) -- +(0.5,0) |- (join_pwm);
+    \path [line] (satlow.east) -- +(0.5,0) |- (join_pwm);
+    
+    \end{tikzpicture}
+    \caption{Software execution flow of the discrete PID algorithm, highlighting first-run derivative protection and integral anti-windup logic.}
+    \label{fig:pid_flow_diagram}
+\end{figure}
 
 

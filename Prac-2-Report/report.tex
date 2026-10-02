@@ -17,6 +17,7 @@
 %                                   Packages                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Equation and Unit Formatting
+\usepackage[utf8]{inputenc}         % UTF-8 encoding — must be before biblatex
 \usepackage{amsmath}                % Essential for math formulas and symbol
 \usepackage{amsfonts}               % Provides additional mathematical fonts
 \usepackage{siunitx}                % The gold standard for units and scientific notation (e.g., 10 \degree C)
@@ -41,7 +42,10 @@
 
 %   Inserting Code Blocks
 \usepackage{listings}               % Formats and includes raw source code into the doc
-\lstset{breaklines = true}			% Makes code wrap around when put into pdf
+\lstset{
+    breaklines    = true,           % Makes code wrap around when put into pdf
+    extendedchars = false,          % Suppress non-ASCII chars that break PDF export
+}
 \usepackage{matlab-prettifier}		% Insert Matlab Code
 
 
@@ -61,6 +65,8 @@
 
 %other
 \usepackage{todonotes}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc}
 
 
 
@@ -81,6 +87,7 @@
 	\include{Content/method}
 	\include{Content/results}
 	\include{Content/discussion}
+	\include{Content/implementation}
 	%\include{Content/conclusion}
 
 	\printbibliography

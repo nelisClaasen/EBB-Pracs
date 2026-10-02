@@ -1,4 +1,119 @@
 \section{Design and Simulation}
+
+\subsection{P Controller}
+
+The Proportional (P) controller was designed using MATLAB's \texttt{pidtune} function applied to the transfer function $G_{11}$ identified in Practical 1.
+The resulting controller has the form $C(s) = K_p$, where the proportional gain was tuned to achieve a phase margin of \SI{60}{\degree}.
+The P controller produces a fast initial response but introduces a steady-state error because, without an integral term, the controller output falls to zero as the error approaches zero.
+
+\begin{lstlisting}[style=Matlab-editor, caption={P Controller Design (MATLAB)}]
+[C1_p, info] = pidtune(G11, 'P');
+\end{lstlisting}
+
+The tuned gain and step-response metrics for the closed-loop system $T(s) = \frac{C_P G_{11}}{1 + C_P G_{11}}$ are summarised in \cref{tab:p_gains,tab:p_metrics}.
+
+\begin{table}[H]
+    \centering
+    \caption{P Controller Tuned Parameters}
+    \label{tab:p_gains}
+    \begin{tblr}{colspec={X|X}, row{even} = {bg = gray!20}}
+        Parameter & Value \\
+        \hline
+        $K_p$ & $0.847505$ \\
+        $K_i$ & --- \\
+        $K_d$ & --- \\
+        Achieved Phase Margin & \SI{60.0}{\degree} \\
+    \end{tblr}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{P Controller Step Response Metrics (2\% Settling Criterion)}
+    \label{tab:p_metrics}
+    \begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
+        Step Response Parameter & Closed Loop & Open Loop \\
+        \hline
+        Overshoot (\%)          & $7.42$    & $0.0$      \\
+        Rise Time (\si{\second})      & $7.9$     & $291.2$    \\
+        Peak Time (\si{\second})      & $21.2$    & $970.5$    \\
+        Settling Time (\si{\second})  & $30.3$    & $524.4$    \\
+        Steady-State Gain       & $0.9296$  & $1.0$      \\
+    \end{tblr}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/P_nodist_response.png}
+    \caption{Closed-loop response of the P controller with no disturbance. Top: reference trajectory and controlled variable (temperature). Bottom: manipulated variable (PWM1 voltage).}
+    \label{fig:p_nodist}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/P_dist_response.png}
+    \caption{Closed-loop response of the P controller with disturbance via $G_{12}$. Top: reference and controlled variable. Bottom: manipulated variable (PWM1) and disturbance input (PWM2).}
+    \label{fig:p_dist}
+\end{figure}
+
+\clearpage
+
+\subsection{PI Controller}
+
+The Proportional-Integral (PI) controller was designed by adding an integral term to eliminate the steady-state error observed in the P controller.
+The controller has the form $C(s) = K_p + \frac{K_i}{s}$, which ensures that the integral term accumulates the error over time and drives the steady-state error to zero.
+The trade-off is a slower response and increased overshoot compared to the P controller.
+
+\begin{lstlisting}[style=Matlab-editor, caption={PI Controller Design (MATLAB)}]
+[C1_pi, info] = pidtune(G11, 'PI');
+\end{lstlisting}
+
+The tuned gains and step-response metrics for the closed-loop system are summarised in \cref{tab:pi_gains,tab:pi_metrics}.
+
+\begin{table}[H]
+    \centering
+    \caption{PI Controller Tuned Parameters}
+    \label{tab:pi_gains}
+    \begin{tblr}{colspec={X|X}, row{even} = {bg = gray!20}}
+        Parameter & Value \\
+        \hline
+        $K_p$ & $0.075342$ \\
+        $K_i$ & $0.001432$ \\
+        $K_d$ & --- \\
+        Achieved Phase Margin & \SI{60.0}{\degree} \\
+    \end{tblr}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{PI Controller Step Response Metrics (2\% Settling Criterion)}
+    \label{tab:pi_metrics}
+    \begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
+        Step Response Parameter & Closed Loop & Open Loop \\
+        \hline
+        Overshoot (\%)          & $12.95$   & $0.0$      \\
+        Rise Time (\si{\second})      & $103.1$   & $291.2$    \\
+        Peak Time (\si{\second})      & $232.6$   & $970.5$    \\
+        Settling Time (\si{\second})  & $394.8$   & $524.4$    \\
+        Steady-State Gain       & $1.0000$  & $1.0$      \\
+    \end{tblr}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/PI_nodist_response.png}
+    \caption{Closed-loop response of the PI controller with no disturbance. Top: reference trajectory and controlled variable (temperature). Bottom: manipulated variable (PWM1 voltage).}
+    \label{fig:pi_nodist}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/PI_dist_response.png}
+    \caption{Closed-loop response of the PI controller with disturbance via $G_{12}$. Top: reference and controlled variable. Bottom: manipulated variable (PWM1) and disturbance input (PWM2).}
+    \label{fig:pi_dist}
+\end{figure}
+
+\clearpage
+
 \subsection{PD Controller}
 The parameters found using Matlab's \texttt{pidtune} function were: $K_p = 4.58$, $K_i = 0.0$, and $K_d = 0.0$.
 The controller was then simulated using the Simulink model below.
