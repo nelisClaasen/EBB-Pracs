@@ -1,6 +1,26 @@
 \section{Design and Simulation}
 \label{sec:design}
 
+The previous First Order Plus Dead Time (FOPDT) models made using Matlab's \texttt{tfest} function were used to construct the simulation models used in this practical.
+
+\begin{equation}
+    G_{11} = \frac{0.1175}{s + 0.007592}\label{eq:G11}
+\end{equation}
+
+\begin{equation}
+    G_{12} = \frac{0.05949}{s + 0.0060685}\label{eq:G12}
+\end{equation}
+
+Matlab's \texttt{compare} function was then used to confirm $G_{11}$'s accuracy. It was found to be $\approx94\%$ accurate.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/g11_accuracy.pdf}
+    \caption{Accuracy comparison of $G_{11}$'s transfer function}
+\end{figure}
+
+\newpage
+
 \subsection{P Controller}
 
 The Proportional (P) controller was designed using MATLAB's \texttt{pidtune} function applied to the transfer function $G_{11}$ identified in Practical 1.
@@ -148,7 +168,7 @@ The tuned gains and step-response metrics for the closed-loop system are summari
 
 \subsection{PD Controller}
 \label{subsec:pd}
-The parameters found using Matlab's \texttt{pidtune} function were: $K_p = 4.58$, $K_i = 0.0$, and $K_d = 0.0$.
+The PID parameters were found using Matlab's \texttt{pidtune} function with $G_{11}$ as the input. Those parameters were: $K_p = 4.58$, $K_i = 0.0$, and $K_d = 0.0$.
 The controller was then simulated using the Simulink model below.
 
 \begin{figure}[H]
@@ -165,43 +185,63 @@ The resulting model was then used to find the following step response parameters
     \caption{PD Controller Step Response Metrics}
     \label{tab:pd_metrics}
     \begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
-    Step Response Parameter & Closed Loop & Open Loop \\
-    \hline
-    Overshoot ($\%$) & $8.8047\times 10^{-5}$ & $0.0$ \\
-    Rise Time ($\mathrm{s}$) & $77.3698$ & $251.4783$\\
-    Peak Time ($\mathrm{s}$) & $119.1159$ & $1500$\\
-    Settling Time ($\mathrm{s}$) & $97.0706$ & $446.5085$\\
-\end{tblr}
+        Step Response Parameter & Closed Loop & Open Loop \\
+        \hline
+        Overshoot ($\%$) & $8.8047\times 10^{-5}$ & $0.0$ \\
+        Rise Time ($\mathrm{s}$) & $77.3698$ & $251.4783$\\
+        Peak Time ($\mathrm{s}$) & $119.1159$ & $1500$\\
+        Settling Time ($\mathrm{s}$) & $97.0706$ & $446.5085$\\
+    \end{tblr}
 \end{table}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PD_open_vs_closed.pdf}
-    \caption{Closed Loop vs Open Loop response of PD Controller}
+    \includegraphics[width=0.8\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PD_no_disturbance.pdf}
+    \caption{PD Control with no disturbance}
 \end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PD_disturbance.pdf}
+    \caption{PD Control with disturbance}
+\end{figure}
+
+\newpage
 
 \subsection{PID - Reference Tracking Controller}
 \label{subsec:pid_ref}
 The parameters found using Matlab's \texttt{pidtune} function were: $K_p = 0.112$, $K_i = 0.000935$, and $K_d = 0.0$.
 
-The same Simulink model used for the PD controller~\ref{fig:PD_simulink_model} was used for the PID reference tracking model.
+The same Simulink model used for the PD controller[~\ref{fig:PD_simulink_model}] was used for the PID reference tracking model.
 
 The following step response parameters where then found using the model:
 
-\begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
-    Step Response Parameter & Closed Loop & Open Loop \\
-    \hline
-    Overshoot ($\%$) & $0.1592$ & $0.0$ \\
-    Rise Time ($\mathrm{s}$) & $123.6591$ & $251.4783$\\
-    Peak Time ($\mathrm{s}$) & $432.7289$ & $1500$\\
-    Settling Time ($\mathrm{s}$) & $220.6166$ & $446.5085$\\
-\end{tblr}
+\begin{table}[H]
+    \caption{Table comparing closed loop PID controller tuned for reference tracking against the open loop controller}
+    \begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
+        Step Response Parameter & Closed Loop & Open Loop \\
+        \hline
+        Overshoot ($\%$) & $0.1592$ & $0.0$ \\
+        Rise Time ($\mathrm{s}$) & $123.6591$ & $251.4783$\\
+        Peak Time ($\mathrm{s}$) & $432.7289$ & $1500$\\
+        Settling Time ($\mathrm{s}$) & $220.6166$ & $446.5085$\\
+    \end{tblr}
+\end{table}
+
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PID_ref_tracking_open_vs_closed.pdf}
-    \caption{Closed Loop vs Open Loop response of PID Reference Tracking Controller}
+    \includegraphics[width=0.8\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PID_ref_tracking_no_disturbance.pdf}
+    \caption{PID reference tracking control with no disturbance}
 \end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PID_ref_tracking_disturbance.pdf}
+    \caption{PID reference tracking control with disturbance}
+\end{figure}
+
+\newpage
 
 \subsection{PID - Disturbance Rejection Controller}
 \label{subsec:pid_dist}
@@ -234,15 +274,15 @@ Again Matlab's \texttt{stepinfo} function was then used to find the following st
     \caption{Closed Loop response of PID Disturbance Rejection Controller}
 \end{figure}
 
-\begin{figure}[h]
-    \centering
+% \begin{figure}[h]
+%     \centering
     
-    \includegraphics[width=0.9\textwidth]{Images/Disturb_reject_model.jpg}
-    \caption{Simulink model for the disturbance rejection PID controller.}
-    \label{fig:simulink_dr}
-\end{figure}
+%     \includegraphics[width=0.9\textwidth]{Images/Disturb_reject_model.jpg}
+%     \caption{Simulink model for the disturbance rejection PID controller.}
+%     \label{fig:simulink_dr}
+% \end{figure}
 
-\todo[inline, color=yellow]{Move these figures around as needed, I just placed them here for now.}
+% \todo[inline, color=yellow]{Move these figures around as needed, I just placed them here for now.}
 
 
 \clearpage % Forces everything after this onto a new page

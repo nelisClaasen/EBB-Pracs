@@ -1,10 +1,10 @@
-filepath = fullfile('..', 'Data2', 'PID_Disturb_Reject_S1_V0.csv');
+filepath = fullfile('..', 'Data2', 'PID_Disturb_Reject_S4_V0.csv');
 all_data = readmatrix(filepath);
 V_PWM1 = [all_data(:,3)];
 Temp_PWM1 = [all_data(:,1)];
 Time_PWM1 = [all_data(:,5)]./1000;
 
-setpoint = 35;
+setpoint = 40;
 
 figure('Name', 'Controller Performance', 'Position', [100, 100, 800, 600]);
 hold on; grid on;
@@ -18,7 +18,7 @@ plot(Time_PWM1, Temp_PWM1, 'b-', 'LineWidth', 1.5, 'DisplayName', 'Temperature C
 % plot(out.ref.Time, out.ref.Data, 'k--', 'LineWidth', 1.5, DisplayName='Setpoint');
 yline(setpoint, 'k--', 'LineWidth', 1.5, DisplayName='Setpoint');
 
-title('Measured Response: PID Disturbance Rejection State 1');
+title('Measured Response: PID Disturbance Rejection State 4');
 ylabel('Temperature (°C)');
 xlabel('Time (s)');
 % ylim([20, 60])
@@ -29,13 +29,13 @@ subplot(2, 1, 2);
 hold on; grid on;
 
 % Plot the simulated temperature
-plot(out.No_disturb.Time, out.No_disturb.Data, 'b-', 'LineWidth', 1.5, 'DisplayName', 'Temperature Closed Loop');
+plot(out.temp_sig.Time, out.temp_sig.Data, 'b-', 'LineWidth', 1.5, 'DisplayName', 'Temperature Closed Loop');
 
 % Plot the reference
 % plot(out.ref.Time, out.ref.Data, 'k--', 'LineWidth', 1.5, DisplayName='Setpoint');
 yline(setpoint, 'k--', 'LineWidth', 1.5, DisplayName='Setpoint');
 
-title('Simulated Response: PID Disturbance Rejection State 1');
+title('Simulated Response: PID Disturbance Rejection State 4');
 ylabel('Temperature (°C)');
 xlabel('Time (s)');
 % ylim([20, 60])
