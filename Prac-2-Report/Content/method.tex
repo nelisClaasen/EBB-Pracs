@@ -1,5 +1,16 @@
 \section{Design and Simulation}
 \subsection{PD Controller}
+The parameters found using Matlab's \texttt{pidtune} function were: $K_p = 4.58$, $K_i = 0.0$, and $K_d = 0.0$.
+The controller was then simulated using the Simulink model below.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/PID_ref_track_model.pdf}
+    \caption{Simulink Model used for PD Controller}
+    \label{fig:PD_simulink_model}
+\end{figure}
+
+The resulting model was then used to find the following step response parameters using Matlab's \texttt{stepinfo} function.
 
 \begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
     Step Response Parameter & Closed Loop & Open Loop \\
@@ -12,11 +23,16 @@
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PD_open_vs_closed_fig.pdf}
+    \includegraphics[width=\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PD_open_vs_closed.pdf}
     \caption{Closed Loop vs Open Loop response of PD Controller}
 \end{figure}
 
 \subsection{PID - Reference Tracking Controller}
+The parameters found using Matlab's \texttt{pidtune} function were: $K_p = 0.112$, $K_i = 0.000935$, and $K_d = 0.0$.
+
+The same Simulink model used for the PD controller~\ref{fig:PD_simulink_model} was used for the PID reference tracking model.
+
+The following step response parameters where then found using the model:
 
 \begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
     Step Response Parameter & Closed Loop & Open Loop \\
@@ -29,13 +45,24 @@
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PID_ref_tracking_open_vs_closed_fig.pdf}
+    \includegraphics[width=\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PID_ref_tracking_open_vs_closed.pdf}
     \caption{Closed Loop vs Open Loop response of PID Reference Tracking Controller}
 \end{figure}
 
 \subsection{PID - Disturbance Rejection Controller}
 
 The parameters used for the disturbance rejection tuning are $K_p = 0.067424$, $K_i = 0.0016631$, and $K_d = 0.68337$.
+
+The controller was then simulated using the Simulink Model below.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Disturb_reject_model.pdf}
+    \caption{Simulink Model used for PID Disturbance Rejection Controller}
+    \label{fig:PID_disturb_reject_simulink_model}
+\end{figure}
+
+Again Matlab's \texttt{stepinfo} function was then used to find the following step response parameters.
 
 \begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
     Step Response Parameter & Closed Loop & Open Loop \\

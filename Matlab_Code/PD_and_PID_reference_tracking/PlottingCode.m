@@ -41,22 +41,85 @@ PID_ref_tracking = feedback(C1_pid*simo_transfer1, 1);
 G11 = simo_transfer1
 G12 = simo_transfer2
 
+% Create a new figure window
 figure('Name', 'Controller Performance', 'Position', [100, 100, 800, 600]);
+
+% --- TOP SUBPLOT: Reference vs. Controlled Variable ---
+subplot(2, 1, 1);
 hold on; grid on;
 % Plot the actual temperature
-plot(out.No_disturb.Time, out.No_disturb.Data, 'b-', 'LineWidth', 1.5, 'DisplayName', 'Temperature Closed Loop');
-
-%Plot the closed loop temp.
-plot(out.openLoop.Time, out.openLoop.Data, 'LineWidth', 1.5, 'DisplayName', 'Temperature Open Loop');
+plot(out.No_disturb.Time, out.No_disturb.Data, 'b-', 'LineWidth', 1.5);
 % Plot the reference
-plot(out.ref.Time, out.ref.Data, 'k--', 'LineWidth', 1.5, DisplayName='Setpoint');
+plot(out.ref.Time, out.ref.Data, 'k--', 'LineWidth', 1.5);
 
+
+% Formatting the top plot
 title('System Response: PID Reference Tracking No Disturbance');
 ylabel('Temperature (°C)');
-xlabel('Time (s)');
-% ylim([20, 60])
-legend('Location', 'best');
+ylim([20, 60])
+legend('Reference Trajectory', 'Controlled Variable (Temperature)', 'Location', 'best');
 hold off;
+
+% --- BOTTOM SUBPLOT: Manipulated vs. Disturbance Variables ---
+subplot(2, 1, 2);
+hold on; grid on;
+
+
+valid_idx = out.control_input1.Time >= 0.15;
+
+
+plot(out.control_input1.Time(valid_idx), out.control_input1.Data(valid_idx), 'r-', 'LineWidth', 1.5);
+
+% Plot the disturbance step normallyvolt_sig
+% plot(out.disturb_input.Time, out.disturb_input.Data, 'm-.', 'LineWidth', 1.5);
+
+% Formatting the bottom plot
+xlabel('Time (seconds)');
+ylabel('Amplitude (Volts / Input)');
+legend('Manipulated Variable (Voltage)', 'Disturbance Variable', 'Location', 'best');
+hold off;
+
+% Create a new figure window
+figure('Name', 'Controller Performance', 'Position', [100, 100, 800, 600]);
+
+% --- TOP SUBPLOT: Reference vs. Controlled Variable ---
+subplot(2, 1, 1);
+hold on; grid on;
+% Plot the actual temperature
+plot(out.Disturb.Time, out.Disturb.Data, 'b-', 'LineWidth', 1.5);
+% Plot the reference
+plot(out.ref.Time, out.ref.Data, 'k--', 'LineWidth', 1.5);
+
+
+% Formatting the top plot
+title('System Response: PID Reference Tracking with Disturbance');
+ylabel('Temperature (°C)');
+ylim([20, 60])
+legend('Reference Trajectory', 'Controlled Variable (Temperature)', 'Location', 'best');
+hold off;
+
+% --- BOTTOM SUBPLOT: Manipulated vs. Disturbance Variables ---
+subplot(2, 1, 2);
+hold on; grid on;
+
+
+valid_idx = out.control_input2.Time >= 0.15;
+
+
+plot(out.control_input2.Time(valid_idx), out.control_input2.Data(valid_idx), 'r-', 'LineWidth', 1.5);
+
+% Plot the disturbance step normallyvolt_sig
+plot(out.disturb_input.Time, out.disturb_input.Data, 'm-.', 'LineWidth', 1.5);
+
+% Formatting the bottom plot
+xlabel('Time (seconds)');
+ylabel('Amplitude (Volts / Input)');
+legend('Manipulated Variable (Voltage)', 'Disturbance Variable', 'Location', 'best');
+hold off;
+
+% 1. Closed-Loop Metrics (From Simulink Data)
+
+
 
 reference_target = 50; 
 
