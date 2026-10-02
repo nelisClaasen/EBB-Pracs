@@ -31,9 +31,14 @@ n_zeros = 0;
 simo_transfer1 = tfest(tfest_data1(:, 1, 1), n_poles, n_zeros, NaN); % PWM1 to T1
 simo_transfer2 = tfest(tfest_data2(:, 1, 1), n_poles, n_zeros, NaN); % PWM2 to T1
 
+figure(1)
+compare(tfest_data1, simo_transfer1);
+legend('Location', 'best');
+ylabel('Change in Temperature (C)')
+
 %create reference tracking PID.
-opts = pidtuneOptions ('DesignFocus', 'disturbance-rejection');
-[C1_pid, info] = pidtune(simo_transfer1, 'PD')
+opts = pidtuneOptions ('DesignFocus', 'reference-tracking');
+[C1_pid, info] = pidtune(simo_transfer1, 'PD', opts)
 
 %get closed loop step response.
 PID_ref_tracking = feedback(C1_pid*simo_transfer1, 1);
@@ -41,14 +46,14 @@ PID_ref_tracking = feedback(C1_pid*simo_transfer1, 1);
 G11 = simo_transfer1
 % G12 = simo_transfer2
 
-toutClosed = out.PD_Closed_Loop.time;
-youtClosed = out.PD_Closed_Loop.signals.values;
-
-toutOpen = out.PD_Open_Loop.time;
-youtOpen = out.PD_Open_Loop.signals.values;
-
-% print("Closed Loop")
-S = stepinfo(youtClosed, toutClosed)
-
-% print("Open Loop")
-S = stepinfo(youtOpen, toutOpen)
+% toutClosed = out.PD_Closed_Loop.time;
+% youtClosed = out.PD_Closed_Loop.signals.values;
+% 
+% toutOpen = out.PD_Open_Loop.time;
+% youtOpen = out.PD_Open_Loop.signals.values;
+% 
+% % print("Closed Loop")
+% S = stepinfo(youtClosed, toutClosed)
+% 
+% % print("Open Loop")
+% S = stepinfo(youtOpen, toutOpen)

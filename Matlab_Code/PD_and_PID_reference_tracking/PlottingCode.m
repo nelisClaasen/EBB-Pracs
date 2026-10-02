@@ -54,9 +54,9 @@ plot(out.ref.Time, out.ref.Data, 'k--', 'LineWidth', 1.5);
 
 
 % Formatting the top plot
-title('System Response: PID Reference Tracking No Disturbance');
+title('System Response: PD Controller No Disturbance');
 ylabel('Temperature (°C)');
-ylim([20, 60])
+% ylim([20, 60])
 legend('Reference Trajectory', 'Controlled Variable (Temperature)', 'Location', 'best');
 hold off;
 
@@ -92,9 +92,9 @@ plot(out.ref.Time, out.ref.Data, 'k--', 'LineWidth', 1.5);
 
 
 % Formatting the top plot
-title('System Response: PID Reference Tracking with Disturbance');
+title('System Response: PD Controller with Disturbance');
 ylabel('Temperature (°C)');
-ylim([20, 60])
+% ylim([20, 60])
 legend('Reference Trajectory', 'Controlled Variable (Temperature)', 'Location', 'best');
 hold off;
 
