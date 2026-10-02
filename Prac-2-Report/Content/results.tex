@@ -1,1 +1,19 @@
 \section{Results}
+
+\newcommand\PlotPID[2]{
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{Images/Results/#1}
+        \caption{#2}
+    \end{figure}
+}
+
+\subsection{PID Reference Tracking}
+
+\PlotPID{PID_ref_tracking_measured_result_S1}{Measured Results for PID reference tracking for state 1}
+\PlotPID{PID_ref_tracking_measured_result_S2}{Measured Results for PID reference tracking for state 2}
+\PlotPID{PID_ref_tracking_measured_result_S3}{Measured Results for PID reference tracking for state 3}
+\PlotPID{PID_ref_tracking_measured_result_S4}{Measured Results for PID reference tracking for state 4}
+
+\subsection{PID Disturbance Rejection}
+
