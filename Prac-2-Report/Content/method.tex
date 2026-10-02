@@ -1,4 +1,4 @@
-\section{Software and Hardware Design Implementation}
+\section{Design and Simulation}
 \subsection{PD Controller}
 
 \begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
@@ -32,3 +32,62 @@
     \includegraphics[width=\textwidth]{../Matlab_Code/PD_and_PID_reference_tracking/PID_ref_tracking_open_vs_closed_fig.pdf}
     \caption{Closed Loop vs Open Loop response of PID Reference Tracking Controller}
 \end{figure}
+
+\subsection{PID - Disturbance Rejection Controller}
+
+The parameters used for the disturbance rejection tuning are $K_p = 0.067424$, $K_i = 0.0016631$, and $K_d = 0.68337$.
+
+\begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
+    Step Response Parameter & Closed Loop & Open Loop \\
+    \hline
+    Overshoot ($\%$) & $9.26$ & $0.0$ \\
+    Rise Time ($\mathrm{s}$) & $102.934$ & $251.4783$\\
+    Peak Time ($\mathrm{s}$) & $225.625$ & $1500$\\
+    Settling Time ($\mathrm{s}$) & $366.913$ & $446.5085$\\
+\end{tblr}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/PID_dist_reject_closed_loop.pdf}
+    \caption{Closed Loop response of PID Disturbance Rejection Controller}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    
+    \includegraphics[width=0.9\textwidth]{Images/Disturb_reject_model.jpg}
+    \caption{Simulink model for the disturbance rejection PID controller.}
+    \label{fig:simulink_dr}
+\end{figure}
+
+\todo[inline, color=yellow]{Move these figures around as needed, I just placed them here for now.}
+
+
+\clearpage % Forces everything after this onto a new page
+
+\begin{figure}[p]
+    \centering
+    
+    % Graph 1: Without Disturbance
+    \begin{subfigure}[b]{0.9\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{Images/PID_Dist_Reject_no_dist.pdf}
+        \caption{Closed-loop response (No Disturbance).}
+        \label{fig:sim_no_dist}
+    \end{subfigure}
+    
+    \vspace{0.5cm} % Reduced from 1cm to save vertical space
+    
+    % Graph 2: With Disturbance
+    \begin{subfigure}[b]{0.9\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{Images/PID_dist_reject_dist.pdf}
+        \caption{Closed-loop response (50\% PWM Disturbance).}
+        \label{fig:sim_with_dist}
+    \end{subfigure}
+    
+    \caption{Simulink closed-loop step response for the disturbance-rejection PID controller. The bottom figure demonstrates the controller compensating for the external heat disturbance caused by transistor 2.}
+    \label{fig:sim_disturbance_comparison}
+\end{figure}
+
+\clearpage
