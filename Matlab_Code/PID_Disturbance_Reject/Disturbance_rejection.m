@@ -26,7 +26,7 @@ plot(out.ref_sig.Time, out.ref_sig.Data, 'k--', 'LineWidth', 1.5);
 
 
 % Formatting the top plot
-title('System Response: Reference Tracking and Disturbance Rejection');
+title('System Response: Disturbance Rejection');
 ylabel('Temperature (°C)');
 ylim([20, 60])
 legend('Reference Trajectory', 'Controlled Variable (Temperature)', 'Location', 'best');
@@ -43,7 +43,7 @@ valid_idx = out.volt_sig.Time >= 0.15;
 plot(out.volt_sig.Time(valid_idx), out.volt_sig.Data(valid_idx), 'r-', 'LineWidth', 1.5);
 
 % Plot the disturbance step normally
-plot(out.dist_sig.Time, out.dist_sig.Data, 'm-.', 'LineWidth', 1.5);
+%plot(out.dist_sig.Time, out.dist_sig.Data, 'm-.', 'LineWidth', 1.5);
 
 % Formatting the bottom plot
 xlabel('Time (seconds)');
