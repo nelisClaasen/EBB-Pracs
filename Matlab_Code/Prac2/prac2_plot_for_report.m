@@ -77,19 +77,20 @@ for k = 1:numel(ctrl_names)
     fprintf('Saved: %s\n', fname_nd);
 
     % --- C. OPEN-LOOP vs CLOSED-LOOP COMPARISON ---
-    % Open-loop: step response of G11 alone, scaled so final value = r_step
-    t_ol   = 0:1:1500;                          % longer window to show OL settling
-    y_ol   = dcgain(G11) * step(G11, t_ol);     % raw open-loop step (1V input)
-    y_ol   = y_ol / dcgain(G11) * r_step;       % scale so OL final = r_step
+    t_compare = (0:1:1500)';             % shared time axis for both curves
 
-    t_cl   = 0:1:700;
-    y_cl   = r_step * step(T_yr, t_cl);         % closed-loop step to r_step
+    % Open-loop: unit step on G11, scaled to r_step final value
+    y_ol = lsim(G11, ones(size(t_compare)), t_compare);
+    y_ol = y_ol * (r_step / dcgain(G11));  % scale so DC value = r_step
+
+    % Closed-loop: step to r_step over same window
+    y_cl = r_step * step(T_yr, t_compare);
 
     fig_ol = figure('Color', 'w', 'Units', 'centimeters', 'Position', [2 2 18 9]);
     hold on;
-    plot(t_ol, y_ol, 'Color', [0.18 0.44 0.72], 'LineWidth', 1.5, ...
+    plot(t_compare, y_ol, 'Color', [0.18 0.44 0.72], 'LineWidth', 1.5, ...
          'DisplayName', 'Open Loop');
-    plot(t_cl, y_cl, 'Color', [0.93 0.69 0.13], 'LineWidth', 1.5, ...
+    plot(t_compare, y_cl, 'Color', [0.93 0.69 0.13], 'LineWidth', 1.5, ...
          'DisplayName', 'Closed Loop');
     yline(r_step, 'k--', 'LineWidth', 1.0, 'HandleVisibility', 'off');
     hold off;
