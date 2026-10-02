@@ -1,4 +1,5 @@
 \section{Design and Simulation}
+\label{sec:design}
 
 \subsection{P Controller}
 
@@ -9,6 +10,22 @@ The P controller produces a fast initial response but introduces a steady-state 
 \begin{lstlisting}[style=Matlab-editor, caption={P Controller Design (MATLAB)}]
 [C1_p, info] = pidtune(G11, 'P');
 \end{lstlisting}
+
+The controller was then simulated using the Simulink model shown in \cref{fig:p_simulink_nodist,fig:p_simulink_dist}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/simulink_nodist_screenshot.png}
+    \caption{Simulink model used for reference tracking with no disturbance (Figure 1 from the practical guide). The controller $C(s)$ drives the plant $G_{11}$ in a unity negative feedback loop.}
+    \label{fig:p_simulink_nodist}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/simulink_dist_screenshot.png}
+    \caption{Simulink model used for reference tracking with disturbance (Figure 2 from the practical guide). The PWM2 input passes through $G_{12}$ and is added to the plant output, simulating the thermal disturbance from transistor 2.}
+    \label{fig:p_simulink_dist}
+\end{figure}
 
 The tuned gain and step-response metrics for the closed-loop system $T(s) = \frac{C_P G_{11}}{1 + C_P G_{11}}$ are summarised in \cref{tab:p_gains,tab:p_metrics}.
 
@@ -43,6 +60,13 @@ The tuned gain and step-response metrics for the closed-loop system $T(s) = \fra
 
 \begin{figure}[H]
     \centering
+    \includegraphics[width=\textwidth]{Images/P_ol_vs_cl.png}
+    \caption{Closed-loop vs open-loop step response of the P controller. The closed-loop response reaches the reference significantly faster but exhibits overshoot and a steady-state error due to the absence of an integral term.}
+    \label{fig:p_ol_vs_cl}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
     \includegraphics[width=\textwidth]{Images/P_nodist_response.png}
     \caption{Closed-loop response of the P controller with no disturbance. Top: reference trajectory and controlled variable (temperature). Bottom: manipulated variable (PWM1 voltage).}
     \label{fig:p_nodist}
@@ -62,6 +86,7 @@ The tuned gain and step-response metrics for the closed-loop system $T(s) = \fra
 The Proportional-Integral (PI) controller was designed by adding an integral term to eliminate the steady-state error observed in the P controller.
 The controller has the form $C(s) = K_p + \frac{K_i}{s}$, which ensures that the integral term accumulates the error over time and drives the steady-state error to zero.
 The trade-off is a slower response and increased overshoot compared to the P controller.
+The same Simulink models shown in \cref{fig:p_simulink_nodist,fig:p_simulink_dist} were used, with the PI gains loaded into the PID Controller block.
 
 \begin{lstlisting}[style=Matlab-editor, caption={PI Controller Design (MATLAB)}]
 [C1_pi, info] = pidtune(G11, 'PI');
@@ -100,6 +125,13 @@ The tuned gains and step-response metrics for the closed-loop system are summari
 
 \begin{figure}[H]
     \centering
+    \includegraphics[width=\textwidth]{Images/PI_ol_vs_cl.png}
+    \caption{Closed-loop vs open-loop step response of the PI controller. The integral term eliminates the steady-state error present in the P controller, with the closed-loop output converging exactly to the \SI{50}{\degreeCelsius} reference.}
+    \label{fig:pi_ol_vs_cl}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
     \includegraphics[width=\textwidth]{Images/PI_nodist_response.png}
     \caption{Closed-loop response of the PI controller with no disturbance. Top: reference trajectory and controlled variable (temperature). Bottom: manipulated variable (PWM1 voltage).}
     \label{fig:pi_nodist}
@@ -115,6 +147,7 @@ The tuned gains and step-response metrics for the closed-loop system are summari
 \clearpage
 
 \subsection{PD Controller}
+\label{subsec:pd}
 The parameters found using Matlab's \texttt{pidtune} function were: $K_p = 4.58$, $K_i = 0.0$, and $K_d = 0.0$.
 The controller was then simulated using the Simulink model below.
 
@@ -127,7 +160,11 @@ The controller was then simulated using the Simulink model below.
 
 The resulting model was then used to find the following step response parameters using Matlab's \texttt{stepinfo} function.
 
-\begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
+\begin{table}[H]
+    \centering
+    \caption{PD Controller Step Response Metrics}
+    \label{tab:pd_metrics}
+    \begin{tblr}{colspec={X|XX}, row{even} = {bg = gray!20}}
     Step Response Parameter & Closed Loop & Open Loop \\
     \hline
     Overshoot ($\%$) & $8.8047\times 10^{-5}$ & $0.0$ \\
@@ -135,6 +172,7 @@ The resulting model was then used to find the following step response parameters
     Peak Time ($\mathrm{s}$) & $119.1159$ & $1500$\\
     Settling Time ($\mathrm{s}$) & $97.0706$ & $446.5085$\\
 \end{tblr}
+\end{table}
 
 \begin{figure}[H]
     \centering
@@ -143,6 +181,7 @@ The resulting model was then used to find the following step response parameters
 \end{figure}
 
 \subsection{PID - Reference Tracking Controller}
+\label{subsec:pid_ref}
 The parameters found using Matlab's \texttt{pidtune} function were: $K_p = 0.112$, $K_i = 0.000935$, and $K_d = 0.0$.
 
 The same Simulink model used for the PD controller~\ref{fig:PD_simulink_model} was used for the PID reference tracking model.
@@ -165,6 +204,7 @@ The following step response parameters where then found using the model:
 \end{figure}
 
 \subsection{PID - Disturbance Rejection Controller}
+\label{subsec:pid_dist}
 
 The parameters used for the disturbance rejection tuning are $K_p = 0.067424$, $K_i = 0.0016631$, and $K_d = 0.68337$.
 

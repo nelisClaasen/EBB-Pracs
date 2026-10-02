@@ -1,3 +1,43 @@
 \section{Discussion}
 
+The general PID controller in the Laplace domain is given by:
 
+\begin{equation}
+    C(s) = K_p + \frac{K_i}{s} + K_d s
+    \label{eq:pid}
+\end{equation}
+
+Each term contributes differently to the closed-loop response, and the simulation results illustrate these effects clearly.
+
+\subsection{Proportional Term}
+
+The proportional term $u_P(t) = K_p\,e(t)$ produces a control action proportional to the current error.
+It increases response speed but cannot eliminate steady-state error for a step input.
+The steady-state output of a P-only closed-loop system is:
+
+\begin{equation}
+    y_{ss} = \frac{K_p\,G_{11}(0)}{1 + K_p\,G_{11}(0)} = \frac{0.8475 \times 15.59}{1 + 0.8475 \times 15.59} = 0.9296
+    \label{eq:p_ss}
+\end{equation}
+
+This matches the simulated result in \cref{tab:p_metrics}, where the closed-loop output settles at $92.96\%$ of the \SI{50}{\degreeCelsius} reference, leaving a permanent error of approximately \SI{3.5}{\degreeCelsius} as seen in \cref{fig:p_nodist}.
+In the disturbance case (\cref{fig:p_dist}), the P controller partially compensates by reducing $u(t)$, but a permanent offset remains since there is no mechanism to accumulate and correct the residual error.
+
+\subsection{Integral Term}
+
+The integral term $u_I(t) = K_i\int_0^t e(\tau)\,d\tau$ accumulates error over time, guaranteeing zero steady-state error for a constant reference by the Internal Model Principle.
+This is confirmed in \cref{tab:pi_metrics}, where the PI controller achieves a steady-state gain of exactly $1.0000$, and \cref{fig:pi_nodist} shows $y(t)$ converging to exactly \SI{50}{\degreeCelsius}.
+
+The cost is a slower, more oscillatory response: rise time increases from \SI{7.9}{\second} (P) to \SI{103.1}{\second} (PI), and overshoot increases from $7.42\%$ to $12.95\%$.
+The integral term also fully rejects the constant disturbance, as seen in \cref{fig:pi_dist} where $y(t)$ returns to \SI{50}{\degreeCelsius} after the PWM2 disturbance at $t = \SI{350}{\second}$, unlike the P controller in \cref{fig:p_dist}.
+
+\subsection{Derivative Term}
+
+The derivative term $u_D(t) = K_d\,\frac{de}{dt}$ acts on the rate of change of error, providing a damping action that reduces overshoot.
+The PD controller results in \cref{tab:pd_metrics} show an overshoot of only $8.8 \times 10^{-5}\%$, compared to $7.42\%$ for P alone, at the cost of a slower rise time (\SI{77.4}{\second}).
+Like the P controller, PD retains a steady-state error since it contains no integrator.
+
+\subsection{Controller Comparison}
+
+Combining all three terms allows the PID controller to benefit from the speed of P, the accuracy of I, and the damping of D simultaneously.
+The reference-tracking and disturbance-rejection PID controllers (\cref{subsec:pid_ref,subsec:pid_dist}) represent different tuning priorities within this structure: the reference-tracking design favours a well-damped step response, while the disturbance-rejection design increases $K_i$ and $K_d$ to suppress disturbances more aggressively.
