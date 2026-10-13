@@ -169,7 +169,7 @@ The tuned gains and step-response metrics for the closed-loop system are summari
 \subsection{PD Controller}
 \label{subsec:pd}
 The PID parameters were found using Matlab's \texttt{pidtune} function with $G_{11}$ as the input. Those parameters were: $K_p = 4.58$, $K_i = 0.0$, and $K_d = 0.0$.
-The controller was then simulated using the Simulink model below.
+The controller was then simulated using the Simulink model below. Where the step response will be shifted up, due to the addition of the ambient temperature.
 
 \begin{figure}[H]
     \centering
