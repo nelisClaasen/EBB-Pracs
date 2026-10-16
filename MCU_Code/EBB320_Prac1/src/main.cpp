@@ -7,10 +7,7 @@
 #include <queue>
 #include "ValuesPID.cpp"
 
-double P = 0;
-double I = 0;
-double D = 0;
-double setpoint = 0;
+
 double duty1 = 128; //50% duty cycle by default.
 double duty2 = 128;
 int control_outputs = 0; //By default only pwm1 is on. 
@@ -19,12 +16,8 @@ int message = 100; //Flags for certain messages.
 int start_time = 0;
 bool startControlling = 0; //See if we should start controlling, or continue just measuring.
 
-//PID variables 
-float error = 0;
-float integral = 0;
-float previous_error = 0;
-float derivative = 0;
-bool do_integration = true;
+ 
+
 
 //New PID structs for eventual use in the controllers.
 ValuesPID controllerG11 = {0, 0, 0, 0, 0, 0, 0, 0};
