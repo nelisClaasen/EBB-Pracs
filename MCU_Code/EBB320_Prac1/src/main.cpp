@@ -7,28 +7,21 @@
 #include <queue>
 #include "ValuesPID.cpp"
 
-double P = 0;
-double I = 0;
-double D = 0;
-double setpoint = 0;
-double disturbance = 0;
-double duty = 128; //50% duty cycle by default.
+
+double duty1 = 128; //50% duty cycle by default.
+double duty2 = 128;
 int control_outputs = 0; //By default only pwm1 is on. 
 bool start = 0; //Start off.   
 int message = 100; //Flags for certain messages.
 int start_time = 0;
 bool startControlling = 0; //See if we should start controlling, or continue just measuring.
 
-//PID variables 
-float error = 0;
-float integral = 0;
-float previous_error = 0;
-float derivative = 0;
-bool do_integration = true;
+ 
+
 
 //New PID structs for eventual use in the controllers.
-ValuesPID controllerG11 = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-ValuesPID controllerG22 = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+ValuesPID controllerG11 = {0, 0, 0, 0, 0, 0, 0, 0};
+ValuesPID controllerG22 = {0, 0, 0, 0, 0, 0, 0, 0};
 
 
 double temp1 = 0; //Final temperature measurement that is sent to PC and used by controller/s.
@@ -154,8 +147,8 @@ void loop() {
     if(startControlling)
     {
       //Turn on the appropriate PWM signals.
-        ledcWrite(0, duty);
-        ledcWrite(1, disturbance);
+        ledcWrite(0, duty1);
+        ledcWrite(1, duty2);
     }
 
     //Interpret sensor data.
@@ -188,44 +181,25 @@ void loop() {
     if (startControlling)
     {
       //PID controller start
-      previous_error = error;
-      error = setpoint - temp1;
+      controllerG11.prev_error = controllerG11.error;
+      controllerG11.error = controllerG11.setpoint - temp1;
+
+      controllerG22.prev_error =  controllerG22.error;
+      controllerG22.error =  controllerG22.setpoint - temp2;
   
       // Prevent derivative kick on first run
   
       if (first_run) {
-        previous_error = error;
+        controllerG11.prev_error = controllerG11.error;
+        controllerG22.prev_error = controllerG22.error;
+
         first_run = false;
       }
-  
-      float next_integral = integral + error * dt;
+
+      duty1 = calculatePID(controllerG11);
+      duty2 =calculatePID(controllerG22);
       
-      derivative = (error - previous_error)/dt;
-  
-      float pid_out = P * error + I*next_integral + D*derivative;
-      //anti-windup logic
-      if  (pid_out >= 3.3 )
-      {
-        duty = 1;
-        if ( error < 0){
-        integral = next_integral;
-        }
-  
-      }
-  
-      else if (pid_out <= 0.0 ) {
-      duty = 0.0; // You cannot have a negative duty cycle for a simple heater/cooler
-      if ( error > 0){
-        integral = next_integral;
-        }
       
-      }
-  
-      else{
-        duty = pid_out/3.3;
-        integral = next_integral;
-      }
-      duty = (pow(2, PWM_res) - 1)*(duty);
 
       // std::string sending = fmt::format("{0}, {1}, {2}, {3}, {4}", P, I, D, error, duty);
       // Serial.println(String(sending.c_str()));
