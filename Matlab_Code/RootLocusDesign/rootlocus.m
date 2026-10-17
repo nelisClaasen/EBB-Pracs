@@ -30,6 +30,8 @@ n_zeros = 0;
 %estimate the transfer functions
 simo_transfer1 = tfest(tfest_data1(:, 1, 1), n_poles, n_zeros, NaN) % PWM1 to T1
 simo_transfer2 = tfest(tfest_data2(:, 2, 1), n_poles, n_zeros, NaN) % PWM2 to T2
+G12 = tfest(tfest_data2(:, 1, 1), n_poles, n_zeros, NaN)
+G21 = tfest(tfest_data1(:, 2, 1), n_poles, n_zeros, NaN)
 
 % s = tf('s');
 % C =  1.17921 * (s + 0.1) * (s + 0.0295055) / s;

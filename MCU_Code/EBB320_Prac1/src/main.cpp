@@ -48,6 +48,41 @@ const int sampling_period = 5000; //In microseconds.
 const float dt = sampling_period/1000000.0; //t delta used in PWM calculations.
 bool first_run = true; //Check if this is the very first run, used the prevent initial derivative kick. (Can be used for both controllers at once since they are controlling at the same time?)
 
+float calculatePID(ValuesPID& controller){
+
+      float duty = 0;
+      float next_integral = controller.integral + controller.error * dt;
+      
+      controller.derivative = (controller.error - controller.prev_error)/dt;
+  
+      float pid_out = controller.P * controller.error + controller.I*next_integral + controller.D*controller.derivative;
+      //anti-windup logic
+      if  (pid_out >= 3.3 )
+      {
+        duty = 1;
+        if ( controller.error < 0){
+        controller.integral = next_integral;
+        }
+  
+      }
+  
+      else if (pid_out <= 0.0 ) {
+      duty = 0.0; // You cannot have a negative duty cycle for a simple heater/cooler
+      if ( controller.error > 0){
+        controller.integral = next_integral;
+        }
+      
+      }
+  
+      else{
+        duty = pid_out/3.3;
+        controller.integral = next_integral;
+      }
+      duty = (pow(2, PWM_res) - 1)*(duty);
+
+    return duty;
+}
+
 void setup() {
   //Start the USB-C serial/UART port.
   Serial.begin(BaudRate);
