@@ -132,3 +132,24 @@ Expanding the controller polynomial yields:
     G_{c22}(s) &= 1.174 \frac{(s + 0.02674)(s + 0.1)}{s} = 1.174s + 0.1488 + \frac{0.00314}{s}
 \end{align*}
 \textbf{Final Gains for \texorpdfstring{$G_{22}$}{G22}:} $K_p = 0.1488$, $K_i = 0.00314$, $K_d = 1.174$
+
+\newcommand\PlotPicture[3]{
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{Images/#1}
+        \caption{#2}
+        \label{#3}
+    \end{figure}
+    }
+
+\subsection{Root Locus Technique for G11}
+    
+\PlotPicture{RootLocus/G11_time.pdf}{Time domain comparison of found PID controller against design point.}{fig:root_locus_time_g11}
+
+\PlotPicture{RootLocus/G11_root.pdf}{Root Locus plot of G11 with PID controller showing the intersection with the design point.}{fig:root_locus_g11}
+
+\subsection{Root Locus Technique for G22}
+
+\PlotPicture{RootLocus/G22_time.pdf}{Time domain comparison of found PID controller against design point.}{fig:root_locus_time_g22}
+
+\PlotPicture{RootLocus/G22_root.pdf}{Root Locus plot of G22 with PID controller showing the intersection with the design point.}{fig:root_locus_g22}
