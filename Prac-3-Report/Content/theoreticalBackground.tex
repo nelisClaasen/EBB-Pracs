@@ -1,16 +1,23 @@
 \section{Theoretical Background}
 
+\subsection{First Order Responses}
+To find the rise time of a First Order Plus Dead Time (FOPDT) transfer function the following equation can be used:~\cite{control_systems}
 \begin{equation}
-    G_c(s) = K_p + \frac{K_i}{s} + K_d s = \frac{K_c (s + z_1)(s + z_2)}{s}\label{eq:PID_TF}
+    T_r = \frac{2.2}{a} \label{eq:first_order_Tr}
 \end{equation}
 
-Therefore:
+The dead time of the FOPDT transfer function can be approximated using Pad\'e first order approximation:
+\begin{equation}
+    e^{-\theta s} \approx \frac{1 - \frac{\theta}{2}s}{1 + \frac{\theta}{2}s} \label{eq:Pade_approx}
+\end{equation}
 
-\begin{align}
-    K_p &= K_c (z_1 + z_2)\label{eq:Kp_from_Kc}\\
-    K_i &= K_c (z_1z_2)\label{eq:Ki_from_Kc}\\
-    K_d &= K_c\label{eq:Kd_from_Kc}
-\end{align}
+\subsection{Second Order Responses}
+The equation defining a standard second order response is defined as:
+\begin{equation*}
+    G(s) = \frac{{\omega_n}^2}{s^2 + 2\zeta{\omega_n}s + {\omega_n}^2}
+\end{equation*}
+
+The equations that then define the dampening ratio and natural radian frequency of the second order response using a pre-define overshoot and rise time are found to be:~\cite{control_systems}
 
 \begin{equation}
     \zeta = \frac{-\ln(\mathrm{\%OS}/100)}{\sqrt{\pi^2 + \ln^2(\mathrm{\%OS/100})}}\label{eq:zeta_from_OS}
@@ -21,9 +28,38 @@ Therefore:
     \omega_n &= (1.76\zeta^3 - 0.417\zeta^2 + 1.039\zeta + 1)/T_r\label{eq:omega_n_from_zeta_and_Tr}
 \end{align}
 
+The equation defining the natural frequency using the system's rise time is found using curve fitting, as a precise analytical equation is not available.~\cite{control_systems}
+
+A design point associated with the found dampening ration and natural radian frequency can then be found using:~\cite{control_systems}
+
 \begin{align}
     \sigma_d &= \zeta\omega_n \label{eq:sigma_d}\\
     \omega_d &= \omega_n \sqrt{1-\zeta^2}\label{eq:omega_d}
 \end{align}
 
+\subsection{PID Controllers}
+From \cite{control_systems} the basic equations that define a PID controller's transfer function are:
+\begin{equation}
+    G_c(s) = K_p + \frac{K_i}{s} + K_d s = \frac{K_c (s + z_1)(s + z_2)}{s}\label{eq:PID_TF}
+\end{equation}
+
+Therefore, it can be found that:
+
+\begin{align}
+    K_p &= K_c (z_1 + z_2)\label{eq:Kp_from_Kc}\\
+    K_i &= K_c (z_1z_2)\label{eq:Ki_from_Kc}\\
+    K_d &= K_c\label{eq:Kd_from_Kc}
+\end{align}
+
+To find the parameters of the PID controller the following equations must be satisfied in order to ensure system stability.
+
+The angle equation:
+\begin{equation}
+    \sum{\text{zero angles}} - \sum{\text{pole angles}} = \pm 180^\circ\label{eq:root_locus_angle_condition}
+\end{equation}
+
+The magnitude equation:
+\begin{equation}
+    |K_c G_c(s_d)G_p(s_d)| = 1\label{eq:root_locus_mag_condition}
+\end{equation}
 

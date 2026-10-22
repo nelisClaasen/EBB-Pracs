@@ -49,7 +49,7 @@ zeta = 0.5912;
 
 G11_SecondOrder = (omega_n^2)/(s^2 + 2*zeta*omega_n*s + omega_n^2);
 
-plotStep(G11, G_c11, G11_SecondOrder, "Second Order Approximation vs PID Feedback Step Response for G11", "G11_time.pdf");
+plotStep(G11, G_c11, G11, "Open Loop vs PID Closed Loop Step Response for G11", "G11_time.pdf");
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% For G22 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 G_c22 = 1.90571 * ((s + 0.1)*(s + 0.0221733)/s);
@@ -60,7 +60,7 @@ zeta = 0.5912;
 
 G22_SecondOrder = (omega_n^2)/(s^2 + 2*zeta*omega_n*s + omega_n^2);
 
-plotStep(G22, G_c22, G22_SecondOrder, "Second Order Approximation vs PID Feedback Step Response for G22", "G22_time.pdf");
+plotStep(G22, G_c22, G22, "Open Loop vs PID Closed Loop Step Response for G22", "G22_time.pdf");
 
 function plotStep(plant, controller, Second_order_approx, figName, fileSaveName)
 
@@ -76,8 +76,8 @@ G_closed = feedback(controller * plant, 1);
 %Plot ideal 2nd order response with controlled tf.
 figure;
 hold on;
-stepplot(G_closed, opts, Name="PID Feedback", LineWidth=2);
-stepplot(Second_order_approx, opts, Name="Ideal Second Order", LineWidth=2);
+stepplot(G_closed, opts, Name="Closed Loop", LineWidth=2);
+stepplot(Second_order_approx/dcgain(Second_order_approx), opts, Name="Open Loop", LineWidth=2);
 legend('Location','best', FontSize=14);
 title(figName);
 
@@ -85,8 +85,16 @@ title(figName);
 G_closed_info = stepinfo(G_closed);
 ideal_info = stepinfo(Second_order_approx);
 
-fprintf("%.2f%% & %.2f\n", ideal_info.Overshoot, G_closed_info.Overshoot); %Compare overshoots.
-fprintf("%.2f & %.2f\n", ideal_info.RiseTime, G_closed_info.RiseTime); %Compare rise times.
+fields = fieldnames(G_closed_info);
+
+disp("For" + figName)
+for i = 1:numel(fields)
+    fieldName = fields{i};
+    fieldValue_open = ideal_info.(fieldName);
+    fieldValue_closed = G_closed_info.(fieldName);
+
+    fprintf('%s & %.2f & %.2f \\\\ \n', fieldName, fieldValue_open, fieldValue_closed);
+end
 
 %Update font sizes.
 fontsize(gcf, 14, "points");

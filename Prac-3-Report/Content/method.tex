@@ -136,20 +136,181 @@ Expanding the controller polynomial yields:
 \newcommand\PlotPicture[3]{
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.8\textwidth]{Images/#1}
+        \includegraphics[width=0.9\textwidth]{Images/#1}
         \caption{#2}
         \label{#3}
     \end{figure}
     }
 
+\newpage
+
 \subsection{Root Locus Technique for G11}
     
-\PlotPicture{RootLocus/G11_time.pdf}{Time domain comparison of found PID controller against design point.}{fig:root_locus_time_g11}
+For the transfer function $G_{11}$ using equation [\ref{eq:first_order_Tr}] the current rise time was found to be $\approx 289.78~\mathrm{sec}$. Therefore, the target rise time is $96.593~\mathrm{sec}$.
 
+Then using equations [\ref{eq:zeta_from_OS}] and [\ref{eq:omega_n_from_zeta_and_Tr}] it was found that:
+\begin{align*}
+    \zeta &\approx 0.5912 \\
+    \omega_n &\approx 0.018967
+\end{align*}
+
+The design point was then found using [\ref{eq:sigma_d}] and [\ref{eq:omega_d}] giving $s_d = -0.01121 + j0.0153$.
+
+The second form of the PID equation [\ref{eq:PID_TF}] was then used to find the controller transfer function.
+
+Furthermore, the Pad\'e approximation [\ref{eq:Pade_approx}] was used to find an approximation of the transfer function's dead time. The new plant transfer function was then found to be:
+
+\begin{equation*}
+    G_p(s) = \frac{(1-0.0725s)}{(1+0.0725s)}\frac{0.1175}{(s+0.007592)}
+\end{equation*}
+
+Letting $z_2 = 0.1$ the angles of the poles and zeros to the design point, and [\ref{eq:root_locus_angle_condition}], it was found:
+
+\begin{align*}
+    \theta_{z=z_1} &+ \theta_{z=z_2} + \theta_{z=13.793} - (\theta_{p=0} + \theta_{p=-13.793} + \theta_{p=-0.007592}) = \pm 180^\circ\\
+    \theta_{z=z_1} &\approx -180^\circ + 219.90^\circ \\
+    \theta_{z=z_1} &\approx 39.905^\circ
+\end{align*}
+
+Therefore, the value of $z_1$ was found as:
+\begin{align*}
+    \tan(\theta_{z=z_1}) &= \frac{0.0153}{z_1 - 0.01121} \\
+    z_1 &= \frac{0.0153 + 0.01121 \tan(\theta_{z=z_1})}{\tan(\theta_{z=z_1})} \\
+    z_1 &\approx 0.0295055
+\end{align*}
+
+The controller gain $K_c$ was found using [\ref{eq:root_locus_mag_condition}] where:
+\begin{align*}
+    |K_c G_c(s_d)G_p(s_d)| &= 1\\
+    |G_c(s_d)G_p(s_d)| &\approx 0.848
+\end{align*}
+
+Therefore:
+\begin{align*}
+    K_c = \frac{1}{|G_c(s_d)G_p(s_d)|} \approx 1.17921
+\end{align*}
+
+The final controller transfer function was then found to be:
+\begin{align*}
+    G_c(s) = \frac{1.17921 (s + 0.1)(s+0.0295055)}{s}
+\end{align*}
+
+Using [\ref{eq:Kd_from_Kc}], [\ref{eq:Ki_from_Kc}] and [\ref{eq:Kd_from_Kc}] the PID values where found to be:
+
+\begin{align*}
+    K_p &= K_c (z_1 + z_2) = 0.152714 \\
+    K_i &= K_c (z_1 z_2) = 0.003479 \\
+    K_d &= K_c = 1.17921
+\end{align*}
+
+In order to confirm the design, the root locus was made using matlab, where the root locus plot has an intersection very close to the design point.
 \PlotPicture{RootLocus/G11_root.pdf}{Root Locus plot of G11 with PID controller showing the intersection with the design point.}{fig:root_locus_g11}
+
+The resulting time domain comparison of the new closed loop transfer function and the open loop transfer function are shown below:
+
+\PlotPicture{RootLocus/G11_time.pdf}{Time domain comparison of open loop plant transfer function against the closed loop system transfer function for G11}{fig:root_locus_time_g11}
+
+The following table compares the open loop and closed loop step response information.
+
+\begin{table}[H]
+    \caption{Table comparing open vs closed loop step response characteristics of G11}
+    \begin{tblr}{colspec={X|XX}, row{even}={bg = gray!20}}
+        \toprule
+        Step Response Parameter & Open Loop & Closed Loop \\
+        \midrule
+        Rise Time (s) & 289.39 & 71.09 \\ 
+        Transient Time (s) & 515.43 & 263.99 \\ 
+        Settling Time (s) & 515.43 & 263.99 \\ 
+        Overshoot (\%) & 0.00 & 13.75 \\ 
+        Undershoot (\%) & -0.00 & -0.00 \\ 
+        Peak Time (s) & 1025.12 & 148.79 \\ 
+        \bottomrule
+    \end{tblr}
+\end{table}
+
+\newpage
 
 \subsection{Root Locus Technique for G22}
 
-\PlotPicture{RootLocus/G22_time.pdf}{Time domain comparison of found PID controller against design point.}{fig:root_locus_time_g22}
+For the transfer function $G_{22}$ using equation [\ref{eq:first_order_Tr}] the current rise time was found to be $\approx 367.65~\mathrm{sec}$. Therefore, the target rise time is $122.55~\mathrm{sec}$.
+
+Then using equations [\ref{eq:zeta_from_OS}] and [\ref{eq:omega_n_from_zeta_and_Tr}] it was found that:
+\begin{align*}
+    \zeta &\approx 0.5912 \\
+    \omega_n &\approx 0.01495
+\end{align*}
+
+The design point was then found using [\ref{eq:sigma_d}] and [\ref{eq:omega_d}] giving $s_d = -0.008838 + j0.0121$.
+
+The second form of the PID equation [\ref{eq:PID_TF}] was then used to find the controller transfer function.
+
+Furthermore, the Pad\'e approximation [\ref{eq:Pade_approx}] was used to find an approximation of the transfer function's dead time. The new plant transfer function was then found to be:
+
+\begin{equation*}
+    G_p(s) = \frac{(1-0.0725s)}{(1+0.0725s)} \frac{0.05872}{(s+0.005984)}
+\end{equation*}
+
+Letting $z_2 = 0.1$ the angles of the poles and zeros to the design point, and [\ref{eq:root_locus_angle_condition}], it was found:
+
+\begin{align*}
+    \theta_{z=z_1} &+ \theta_{z=z_2} + \theta_{z=13.793} - (\theta_{p=0} + \theta_{p=-13.793} + \theta_{p=-0.005984}) = \pm 180^\circ\\
+    \theta_{z=z_1} &\approx -180^\circ + 222.12^\circ \\
+    \theta_{z=z_1} &\approx 42.119^\circ
+\end{align*}
+
+Therefore, the value of $z_1$ was found as:
+\begin{align*}
+    \tan(\theta_{z=z_1}) &= \frac{0.0121}{z_1 - 0.00884} \\
+    z_1 &= \frac{0.0121 + 0.00884 \tan(\theta_{z=z_1})}{\tan(\theta_{z=z_1})} \\
+    z_1 &\approx 0.0221733
+\end{align*}
+
+The controller gain $K_c$ was found using [\ref{eq:root_locus_mag_condition}] where:
+\begin{align*}
+    |K_c G_c(s_d)G_p(s_d)| &= 1\\
+    |G_c(s_d)G_p(s_d)| &\approx 0.52473
+\end{align*}
+
+Therefore:
+\begin{align*}
+    K_c = \frac{1}{|G_c(s_d)G_p(s_d)|} \approx 1.90571
+\end{align*}
+
+The final controller transfer function was then found to be:
+\begin{align*}
+    G_c(s) = \frac{1.90571 (s + 0.1)(s+0.0221733)}{s}
+\end{align*}
+
+Using [\ref{eq:Kd_from_Kc}], [\ref{eq:Ki_from_Kc}] and [\ref{eq:Kd_from_Kc}] the PID values where found to be:
+
+\begin{align*}
+    K_p &= K_c (z_1 + z_2) = 0.232827 \\
+    K_i &= K_c (z_1 z_2) = 0.0042256 \\
+    K_d &= K_c = 1.90571
+\end{align*}
+
+In order to confirm the design, the root locus was made using matlab, where the root locus plot has an intersection very close to the design point.
 
 \PlotPicture{RootLocus/G22_root.pdf}{Root Locus plot of G22 with PID controller showing the intersection with the design point.}{fig:root_locus_g22}
+
+The resulting time domain comparison of the new closed loop transfer function and the open loop transfer function are shown below:
+
+\PlotPicture{RootLocus/G22_time.pdf}{Time domain comparison of open loop plant transfer function against the closed loop system transfer function for G22}{fig:root_locus_time_g22}
+
+The following table compares the open loop and closed loop step response information.
+
+\begin{table}[H]
+    \caption{Table comparing open vs closed loop step response characteristics of G22}
+    \begin{tblr}{colspec={X|XX}, row{even}={bg = gray!20}}
+        \toprule
+        Step Response Parameter & Open Loop & Closed Loop \\
+        \midrule
+        Rise Time (s) & 367.15 & 90.64 \\ 
+        Transient Time (s) & 653.90 & 335.60 \\ 
+        Settling Time (s) & 653.90 & 335.60 \\ 
+        Overshoot (\%) & 0.00 & 14.07 \\ 
+        Undershoot (\%) & -0.00 & -0.00 \\ 
+        Peak Time (s) & 1300.59 & 188.79 \\ 
+        \bottomrule
+    \end{tblr}
+\end{table}
