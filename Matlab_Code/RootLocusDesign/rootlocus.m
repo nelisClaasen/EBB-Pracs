@@ -42,112 +42,132 @@ G21 = exp(-0.145*s) * (0.06368/(s + 0.006012));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% For G11 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 G_c11 = 1.17921 * ((s + 0.1)*(s + 0.0295055)/s);
-plotRootLocus(G11, G_c11, 1.17921, "Root Locus with Padé Approximation for G11");
+plotRootLocus(G11, G_c11, 1.17921, "Root Locus with Padé Approximation for G11", "G11_root.pdf");
 
 omega_n = 0.018967;
 zeta = 0.5912;
 
 G11_SecondOrder = (omega_n^2)/(s^2 + 2*zeta*omega_n*s + omega_n^2);
 
-plotStep(G11, G_c11, G11_SecondOrder, "Second Order Approximation vs PID Feedback Step Response for G11");
+plotStep(G11, G_c11, G11_SecondOrder, "Second Order Approximation vs PID Feedback Step Response for G11", "G11_time.pdf");
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% For G22 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 G_c22 = 1.90571 * ((s + 0.1)*(s + 0.0221733)/s);
-plotRootLocus(G22, G_c22, 1.90571, "Root Locus with Padé Approximation for G22");
+plotRootLocus(G22, G_c22, 1.90571, "Root Locus with Padé Approximation for G22", "G22_root.pdf");
 
 omega_n = 0.01495;
 zeta = 0.5912;
 
 G22_SecondOrder = (omega_n^2)/(s^2 + 2*zeta*omega_n*s + omega_n^2);
 
-plotStep(G22, G_c22, G22_SecondOrder, "Second Order Approximation vs PID Feedback Step Response for G22");
+plotStep(G22, G_c22, G22_SecondOrder, "Second Order Approximation vs PID Feedback Step Response for G22", "G22_time.pdf");
 
-function plotStep(plant, controller, Second_order_approx, figName)
+function plotStep(plant, controller, Second_order_approx, figName, fileSaveName)
 
-    %Get feedback tf
-    G_closed = feedback(controller * plant, 1);
+opts = timeoptions('cstprefs');
+opts.Title.FontSize = 14;
+opts.XLabel.FontSize = 14;
+opts.YLabel.FontSize = 14;
+opts.TickLabel.FontSize = 10;
 
-    %Plot ideal 2nd order response with controlled tf.
-    figure;
-    hold on;
-    stepplot(G_closed, Name="PID Feedback", LineWidth=2);
-    stepplot(Second_order_approx, Name="Ideal Second Order", LineWidth=2);
-    legend('Location','best');
-    title(figName);
-    
-    %Print out table comparing characteristics of the two.
-    G_closed_info = stepinfo(G_closed);
-    ideal_info = stepinfo(Second_order_approx);
+%Get feedback tf
+G_closed = feedback(controller * plant, 1);
 
-    fprintf("%.2f%% & %.2f\n", ideal_info.Overshoot, G_closed_info.Overshoot); %Compare overshoots.
-    fprintf("%.2f & %.2f\n", ideal_info.RiseTime, G_closed_info.RiseTime); %Compare rise times.
+%Plot ideal 2nd order response with controlled tf.
+figure;
+hold on;
+stepplot(G_closed, opts, Name="PID Feedback", LineWidth=2);
+stepplot(Second_order_approx, opts, Name="Ideal Second Order", LineWidth=2);
+legend('Location','best', FontSize=14);
+title(figName);
+
+%Print out table comparing characteristics of the two.
+G_closed_info = stepinfo(G_closed);
+ideal_info = stepinfo(Second_order_approx);
+
+fprintf("%.2f%% & %.2f\n", ideal_info.Overshoot, G_closed_info.Overshoot); %Compare overshoots.
+fprintf("%.2f & %.2f\n", ideal_info.RiseTime, G_closed_info.RiseTime); %Compare rise times.
+
+%Update font sizes.
+fontsize(gcf, 14, "points");
+hold off;
+
+filepath = fullfile('..', '..', 'Prac-3-Report', 'Images', 'RootLocus', fileSaveName);
+exportgraphics(gcf, filepath, 'ContentType','vector');
+
 end
 
-function plotRootLocus(plant, controller, K_c, figName)
-    G_pade = pade(plant, 1);
-    G_c = 1/K_c * controller;
+function plotRootLocus(plant, controller, K_c, figName, fileSaveName)
+G_pade = pade(plant, 1);
+G_c = 1/K_c * controller;
 
-    L_sys = G_pade * G_c;
+L_sys = G_pade * G_c;
 
-    figure("Name", 'Root Locus PID Verification')
-    rlocus(L_sys)
-    hold on;
+figure("Name", 'Root Locus PID Verification')
+rlocus(L_sys)
+% set(findall(gca, 'Type', 'Line'), 'LineWidth', 2); % Change 2 to your desired thickness
+hold on;
 
-    % 4. Target Design Specifications
-    Mp = 0.10; % 10% overshoot
-    zeta = -log(Mp) / sqrt(pi^2 + (log(Mp))^2); % ~0.5912
+% 4. Target Design Specifications
+Mp = 0.10; % 10% overshoot
+zeta = -log(Mp) / sqrt(pi^2 + (log(Mp))^2); % ~0.5912
 
-    tr_uncomp = log(9) / plant.Denominator{1}(2);
-    tr_req = tr_uncomp / 3; % ~96.47 seconds
-    wn = (1.76*zeta^3 - 0.417 * zeta^2 + 1.039*zeta + 1)/tr_req; %(pi - acos(zeta)) / (tr_req * sqrt(1 - zeta^2)); % ~0.0283 rad/s
+tr_uncomp = log(9) / plant.Denominator{1}(2);
+tr_req = tr_uncomp / 3; % ~96.47 seconds
+wn = (1.76*zeta^3 - 0.417 * zeta^2 + 1.039*zeta + 1)/tr_req; %(pi - acos(zeta)) / (tr_req * sqrt(1 - zeta^2)); % ~0.0283 rad/s
 
-    % Target closed-loop dominant pole
-    sd_real = -zeta * wn;
-    sd_imag = wn * sqrt(1 - zeta^2);
-    sd = sd_real + 1i*sd_imag;
+% Target closed-loop dominant pole
+sd_real = -zeta * wn;
+sd_imag = wn * sqrt(1 - zeta^2);
+sd = sd_real + 1i*sd_imag;
 
-    % Overlay damping ratio and natural frequency grid
-    sgrid(zeta, wn);
+% Overlay damping ratio and natural frequency grid
+sgrid(zeta, wn);
 
-    % Mark the desired closed-loop pole s_d
-    % plot(real(sd), imag(sd), 'r*', 'MarkerSize', 12, 'LineWidth', 2, 'DisplayName', 'Target s_d');
-    % plot(real(sd), -imag(sd), 'r*', 'MarkerSize', 12, 'LineWidth', 2, 'HandleVisibility', 'off');
+% Mark the desired closed-loop pole s_d
+% plot(real(sd), imag(sd), 'r*', 'MarkerSize', 12, 'LineWidth', 2, 'DisplayName', 'Target s_d');
+% plot(real(sd), -imag(sd), 'r*', 'MarkerSize', 12, 'LineWidth', 2, 'HandleVisibility', 'off');
 
-    % Formatting
-    title(figName);
-    legend('show', 'Location', 'best');
-    axis([-0.1 0.02 -0.05 0.05]); % Zoom into relevant locus area
-    grid on;
+% Formatting
+title(figName);
+legend('show', 'Location', 'best');
+axis([-0.12 0.02 -0.05 0.05]); % Zoom into relevant locus area
+grid on;
 
-    % 2. Find the Root Locus Line Closest to target s_d
-    sd_target = sd; % Your target s_d
-    hLines = findobj(gca, 'Type', 'Line');
-    bestLine = [];
-    bestIdx = 1;
-    minDist = inf;
+% 2. Find the Root Locus Line Closest to target s_d
+sd_target = sd; % Your target s_d
+hLines = findobj(gca, 'Type', 'Line');
+bestLine = [];
+bestIdx = 1;
+minDist = inf;
 
-    for k = 1:length(hLines)
-        xData = hLines(k).XData;
-        yData = hLines(k).YData;
-        if ~isempty(xData)
-            dist = (xData - real(sd_target)).^2 + (yData - imag(sd_target)).^2;
-            [val, idx] = min(dist);
-            if val < minDist
-                minDist = val;
-                bestLine = hLines(k);
-                bestIdx = idx;
-            end
+for k = 1:length(hLines)
+    xData = hLines(k).XData;
+    yData = hLines(k).YData;
+    if ~isempty(xData)
+        dist = (xData - real(sd_target)).^2 + (yData - imag(sd_target)).^2;
+        [val, idx] = min(dist);
+        if val < minDist
+            minDist = val;
+            bestLine = hLines(k);
+            bestIdx = idx;
         end
     end
+end
 
-    % 3. Create Native Data Tip (Modern R2019b+ syntax)
-    if ~isempty(bestLine)
-        targetX = bestLine.XData(bestIdx);
-        targetY = bestLine.YData(bestIdx);
+% 3. Create Native Data Tip (Modern R2019b+ syntax)
+if ~isempty(bestLine)
+    targetX = bestLine.XData(bestIdx);
+    targetY = bestLine.YData(bestIdx);
 
-        % Directly attach data tip to line object
-        dt = datatip(bestLine, targetX, targetY);
-    end
+    % Directly attach data tip to line object
+    dt = datatip(bestLine, targetX, targetY);
+end
 
-    hold off;
+%Update font sizes.
+fontsize(gcf, 14, "points");
+hold off;
+
+filepath = fullfile('..', '..', 'Prac-3-Report', 'Images', 'RootLocus', fileSaveName);
+exportgraphics(gcf, filepath, 'ContentType','vector');
 end

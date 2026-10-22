@@ -1,1 +1,22 @@
 \section{Design and Simulation}
+
+\newcommand\PlotPicture[3]{
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{Images/#1}
+        \caption{#2}
+        \label{#3}
+    \end{figure}
+    }
+
+\subsection{Root Locus Technique for G11}
+    
+\PlotPicture{RootLocus/G11_time.pdf}{Time domain comparison of found PID controller against design point.}{fig:root_locus_time_g11}
+
+\PlotPicture{RootLocus/G11_root.pdf}{Root Locus plot of G11 with PID controller showing the intersection with the design point.}{fig:root_locus_g11}
+
+\subsection{Root Locus Technique for G22}
+
+\PlotPicture{RootLocus/G22_time.pdf}{Time domain comparison of found PID controller against design point.}{fig:root_locus_time_g22}
+
+\PlotPicture{RootLocus/G22_root.pdf}{Root Locus plot of G22 with PID controller showing the intersection with the design point.}{fig:root_locus_g22}

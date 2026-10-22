@@ -1,2 +1,29 @@
 \section{Theoretical Background}
 
+\begin{equation}
+    G_c(s) = K_p + \frac{K_i}{s} + K_d s = \frac{K_c (s + z_1)(s + z_2)}{s}
+\end{equation}
+
+Therefore:
+
+\begin{align}
+    K_p &= K_c (z_1 + z_2)\label{eq:Kp_from_Kc}\\
+    K_i &= K_c (z_1z_2)\label{eq:Ki_from_Kc}\\
+    K_d &= K_c\label{eq:Kd_from_Kc}
+\end{align}
+
+\begin{equation}
+    \zeta = \frac{-\ln(\mathrm{\%OS}/100)}{\sqrt{\pi^2 + \ln^2(\mathrm{\%OS/100})}}\label{eq:zeta_from_OS}
+\end{equation}
+
+\begin{align}
+    \omega_n T_r &= 1.76\zeta^3 - 0.417\zeta^2 + 1.039\zeta + 1 \nonumber \\
+    \omega_n &= (1.76\zeta^3 - 0.417\zeta^2 + 1.039\zeta + 1)/T_r\label{eq:omega_n_from_zeta_and_Tr}
+\end{align}
+
+\begin{align}
+    \sigma_d &= \zeta\omega_n \\
+    \omega_d &= \omega_n \sqrt{1-\zeta^2}
+\end{align}
+
+
