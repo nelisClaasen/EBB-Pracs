@@ -28,125 +28,126 @@ n_poles = 1;
 n_zeros = 0;
 
 %estimate the transfer functions
-simo_transfer1 = tfest(tfest_data1(:, 1, 1), n_poles, n_zeros, NaN) % PWM1 to T1
-simo_transfer2 = tfest(tfest_data2(:, 2, 1), n_poles, n_zeros, NaN) % PWM2 to T2
-G12 = tfest(tfest_data2(:, 1, 1), n_poles, n_zeros, NaN)
-G21 = tfest(tfest_data1(:, 2, 1), n_poles, n_zeros, NaN)
+% simo_transfer1 = tfest(tfest_data1(:, 1, 1), n_poles, n_zeros, NaN) % PWM1 to T1
+% simo_transfer2 = tfest(tfest_data2(:, 2, 1), n_poles, n_zeros, NaN) % PWM2 to T2
+% G12 = tfest(tfest_data2(:, 1, 1), n_poles, n_zeros, NaN)
+% G21 = tfest(tfest_data1(:, 2, 1), n_poles, n_zeros, NaN)
 
-% s = tf('s');
-% C =  1.17921 * (s + 0.1) * (s + 0.0295055) / s;
-% GC_G11 = C * pade(simo_transfer1, 1);
-% 
-% rlocus(GC_G11);
-% grid on;
+s = tf('s');
+G11 = exp(-0.145*s) * (0.1175/(s + 0.007592));
+G22 = exp(-0.145*s) * (0.05872/(s + 0.005984));
+G12 = exp(-0.145*s) * (0.03658/(s + 0.005254));
+G21 = exp(-0.145*s) * (0.06368/(s + 0.006012));
 
-% s = tf('s');
-% G = (0.1175 / (s + 0.007592)) * exp(-0.145*s);
-% 
-% % Closed-loop step response
-% T = feedback(C*G, 1);
-% step(T);
-% grid on;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% For G11 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 1. Define Plant and Padé Approximation
-s = tf('s');
-K_plant = 0.1175;
-a = 0.007592;
-L = 0.145;
+G_c11 = 1.17921 * ((s + 0.1)*(s + 0.0295055)/s);
+plotRootLocus(G11, G_c11, 1.17921, "Root Locus with Padé Approximation for G11");
 
-G_exact = (K_plant / (s + a)) * exp(-L*s);
-G_pade = pade(G_exact, 1); % 1st-order Padé approximation
+omega_n = 0.018967;
+zeta = 0.5912;
 
-% 2. Define Controller Zeros and Unscaled PID
-z1 = 0.1;
-z2 = 0.0295055;
-C_unscaled = (s + z1) * (s + z2) / s; % C(s) without Kc gain
+G11_SecondOrder = (omega_n^2)/(s^2 + 2*zeta*omega_n*s + omega_n^2);
 
-% 3. Open-Loop Transfer Function for Root Locus
-L_sys = C_unscaled * G_pade;
-
-% 4. Target Design Specifications
-Mp = 0.10; % 10% overshoot
-zeta = -log(Mp) / sqrt(pi^2 + (log(Mp))^2); % ~0.5912
-
-tr_uncomp = log(9) / a;
-tr_req = tr_uncomp / 3; % ~96.47 seconds
-wn = (1.76*zeta^3 - 0.417 * zeta^2 + 1.039*zeta + 1)/tr_req; %(pi - acos(zeta)) / (tr_req * sqrt(1 - zeta^2)); % ~0.0283 rad/s
-
-% Target closed-loop dominant pole
-sd_real = -zeta * wn;
-sd_imag = wn * sqrt(1 - zeta^2);
-sd = sd_real + 1i*sd_imag;
-
-% 5. Plot Root Locus
-figure('Name', 'Root Locus PID Verification');
-rlocus(L_sys);
-hold on;
-
-% Overlay damping ratio and natural frequency grid
-sgrid(zeta, wn);
-
-% Mark the desired closed-loop pole s_d
-plot(real(sd), imag(sd), 'r*', 'MarkerSize', 12, 'LineWidth', 2, 'DisplayName', 'Target s_d');
-plot(real(sd), -imag(sd), 'r*', 'MarkerSize', 12, 'LineWidth', 2, 'HandleVisibility', 'off');
-
-% Formatting
-title('Root Locus with Padé Approximation G11');
-legend('show', 'Location', 'best');
-axis([-0.1 0.02 -0.05 0.05]); % Zoom into relevant locus area
-grid on;
-hold off;
+plotStep(G11, G_c11, G11_SecondOrder, "Second Order Approximation vs PID Feedback Step Response for G11");
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% For G22 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 1. Define Plant and Padé Approximation
-s = tf('s');
-K_plant = 0.05872;
-a = 0.005984;
-L = 0.145;
+G_c22 = 1.90571 * ((s + 0.1)*(s + 0.0221733)/s);
+plotRootLocus(G22, G_c22, 1.90571, "Root Locus with Padé Approximation for G22");
 
-G_exact = (K_plant / (s + a)) * exp(-L*s);
-G_pade = pade(G_exact, 1); % 1st-order Padé approximation
+omega_n = 0.01495;
+zeta = 0.5912;
 
-% 2. Define Controller Zeros and Unscaled PID
-z1 = 0.1;
-z2 = 0.0221733;
-C_unscaled = (s + z1) * (s + z2) / s; % C(s) without Kc gain
+G22_SecondOrder = (omega_n^2)/(s^2 + 2*zeta*omega_n*s + omega_n^2);
 
-% 3. Open-Loop Transfer Function for Root Locus
-L_sys = C_unscaled * G_pade;
+plotStep(G22, G_c22, G22_SecondOrder, "Second Order Approximation vs PID Feedback Step Response for G22");
 
-% 4. Target Design Specifications
-Mp = 0.10; % 10% overshoot
-zeta = -log(Mp) / sqrt(pi^2 + (log(Mp))^2); % ~0.5912
+function plotStep(plant, controller, Second_order_approx, figName)
 
-tr_uncomp = log(9) / a;
-tr_req = tr_uncomp / 3; % ~96.47 seconds
-wn = (1.76*zeta^3 - 0.417 * zeta^2 + 1.039*zeta + 1)/tr_req; %(pi - acos(zeta)) / (tr_req * sqrt(1 - zeta^2)); % ~0.0283 rad/s
+    %Get feedback tf
+    G_closed = feedback(controller * plant, 1);
 
-% Target closed-loop dominant pole
-sd_real = -zeta * wn;
-sd_imag = wn * sqrt(1 - zeta^2);
-sd = sd_real + 1i*sd_imag;
+    %Plot ideal 2nd order response with controlled tf.
+    figure;
+    hold on;
+    stepplot(G_closed, Name="PID Feedback", LineWidth=2);
+    stepplot(Second_order_approx, Name="Ideal Second Order", LineWidth=2);
+    legend('Location','best');
+    title(figName);
+    
+    %Print out table comparing characteristics of the two.
+    G_closed_info = stepinfo(G_closed);
+    ideal_info = stepinfo(Second_order_approx);
 
-% 5. Plot Root Locus
-figure('Name', 'Root Locus PID Verification');
-rlocus(L_sys);
-hold on;
+    fprintf("%.2f%% & %.2f\n", ideal_info.Overshoot, G_closed_info.Overshoot); %Compare overshoots.
+    fprintf("%.2f & %.2f\n", ideal_info.RiseTime, G_closed_info.RiseTime); %Compare rise times.
+end
 
-% Overlay damping ratio and natural frequency grid
-sgrid(zeta, wn);
+function plotRootLocus(plant, controller, K_c, figName)
+    G_pade = pade(plant, 1);
+    G_c = 1/K_c * controller;
 
-% Mark the desired closed-loop pole s_d
-plot(real(sd), imag(sd), 'r*', 'MarkerSize', 12, 'LineWidth', 2, 'DisplayName', 'Target s_d');
-plot(real(sd), -imag(sd), 'r*', 'MarkerSize', 12, 'LineWidth', 2, 'HandleVisibility', 'off');
+    L_sys = G_pade * G_c;
 
-% Formatting
-title('Root Locus with Padé Approximation G22');
-legend('show', 'Location', 'best');
-axis([-0.1 0.02 -0.05 0.05]); % Zoom into relevant locus area
-grid on;
-hold off;
+    figure("Name", 'Root Locus PID Verification')
+    rlocus(L_sys)
+    hold on;
 
-% G11_info = stepinfo(out.G11.Data, out.G11.Time)
-G22_info = stepinfo(out.G22.Data, out.G22.Time)
+    % 4. Target Design Specifications
+    Mp = 0.10; % 10% overshoot
+    zeta = -log(Mp) / sqrt(pi^2 + (log(Mp))^2); % ~0.5912
+
+    tr_uncomp = log(9) / plant.Denominator{1}(2);
+    tr_req = tr_uncomp / 3; % ~96.47 seconds
+    wn = (1.76*zeta^3 - 0.417 * zeta^2 + 1.039*zeta + 1)/tr_req; %(pi - acos(zeta)) / (tr_req * sqrt(1 - zeta^2)); % ~0.0283 rad/s
+
+    % Target closed-loop dominant pole
+    sd_real = -zeta * wn;
+    sd_imag = wn * sqrt(1 - zeta^2);
+    sd = sd_real + 1i*sd_imag;
+
+    % Overlay damping ratio and natural frequency grid
+    sgrid(zeta, wn);
+
+    % Mark the desired closed-loop pole s_d
+    % plot(real(sd), imag(sd), 'r*', 'MarkerSize', 12, 'LineWidth', 2, 'DisplayName', 'Target s_d');
+    % plot(real(sd), -imag(sd), 'r*', 'MarkerSize', 12, 'LineWidth', 2, 'HandleVisibility', 'off');
+
+    % Formatting
+    title(figName);
+    legend('show', 'Location', 'best');
+    axis([-0.1 0.02 -0.05 0.05]); % Zoom into relevant locus area
+    grid on;
+
+    % 2. Find the Root Locus Line Closest to target s_d
+    sd_target = sd; % Your target s_d
+    hLines = findobj(gca, 'Type', 'Line');
+    bestLine = [];
+    bestIdx = 1;
+    minDist = inf;
+
+    for k = 1:length(hLines)
+        xData = hLines(k).XData;
+        yData = hLines(k).YData;
+        if ~isempty(xData)
+            dist = (xData - real(sd_target)).^2 + (yData - imag(sd_target)).^2;
+            [val, idx] = min(dist);
+            if val < minDist
+                minDist = val;
+                bestLine = hLines(k);
+                bestIdx = idx;
+            end
+        end
+    end
+
+    % 3. Create Native Data Tip (Modern R2019b+ syntax)
+    if ~isempty(bestLine)
+        targetX = bestLine.XData(bestIdx);
+        targetY = bestLine.YData(bestIdx);
+
+        % Directly attach data tip to line object
+        dt = datatip(bestLine, targetX, targetY);
+    end
+
+    hold off;
+end
