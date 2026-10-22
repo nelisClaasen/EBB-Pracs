@@ -61,7 +61,7 @@
 # ---------------------------------------------------
 # Uncomment the line below if you do NOT want to track 
 # the generated PDFs in your repository.
-# *.pdf
+*.pdf
 
 # MATLAB Autosaves and Backups
 *.asv
