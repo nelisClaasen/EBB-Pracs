@@ -1,4 +1,137 @@
 \section{Design and Simulation}
+The following table contains the derived transfer functions that were used to simulate and implement the controllers.
+
+\begin{table}[htbp]
+
+    \centering
+
+    \caption{2x2 Process Transfer Function Matrix}
+
+    \label{tab:transfer_matrix}
+
+    \renewcommand{\arraystretch}{2.5} % Increases vertical spacing so fractions don't feel cramped
+
+    \begin{tabular}{@{}lcc@{}}
+
+        \toprule
+
+         & \textbf{Input 1 ($U_1$)} & \textbf{Input 2 ($U_2$)} \\
+
+        \midrule
+
+        \textbf{Output 1 ($Y_1$)} & 
+
+        $G_{11}(s) = \frac{0.1179}{s + 0.0076}e^{-0.145s}$ & 
+
+        $G_{12}(s) = \frac{0.03658}{s + 0.005254}e^{-0.145s}$ \\
+
+        
+
+        \textbf{Output 2 ($Y_2$)} & 
+
+        $G_{21}(s) = \frac{0.06368}{s + 0.006012}e^{-0.145s}$ & 
+
+        $G_{22}(s) = \frac{0.05872}{s + 0.005984}e^{-0.145s}$ \\
+
+        \bottomrule
+
+    \end{tabular}
+
+\end{table}
+
+\subsection{PID Controller Design for \texorpdfstring{$G_{11}(s)$}{G11(s)}}
+
+The design specifications are a $10\%$ overshoot and a rise time of $T_r = 96.1$ s. The damping ratio $\zeta$ is calculated as:
+\begin{align*}
+    \zeta &= \frac{-\ln(0.1)}{\sqrt{\pi^2 + [\ln(0.1)]^2}} = 0.591
+\end{align*}
+The required natural frequency $\omega_n$ is:
+\begin{align*}
+    \omega_n &= \frac{1.76(0.591)^3 - 0.417(0.591)^2 + 1.039(0.591) + 1}{96.1} = 0.01906 \text{ rad/s}
+\end{align*}
+The required closed-loop bandwidth $\omega_{BW}$ and phase margin $\Phi_M$ are:
+\begin{align*}
+    \omega_{BW} &= \omega_n \sqrt{(1-2\zeta^2)+\sqrt{4\zeta^4-4\zeta^2+2}} = 0.02211 \text{ rad/s} \\
+    \Phi_M &= \tan^{-1} \left( \frac{2\zeta}{\sqrt{-2\zeta^2+\sqrt{1+4\zeta^4}}} \right) = 58.58^\circ
+\end{align*}
+
+Following the prescribed procedure, the PI controller zero is fixed at $z_2 = 0.1$, yielding $G_{PI}(s) = \frac{s + 0.1}{s}$. The new phase-margin frequency $\omega_s$ is selected as $80\%$ of the bandwidth:
+\begin{align*}
+    \omega_s &= 0.8 \times 0.02211 = 0.01769 \text{ rad/s}
+\end{align*}
+
+The target total loop phase at $\omega_s$ is:
+\begin{align*}
+    \phi_{required}(\omega_s) &= -180^\circ + 58.58^\circ = -121.42^\circ
+\end{align*}
+The phase contributions of the uncompensated plant (including dead time) and the PI controller at $\omega_s$ are:
+\begin{align*}
+    \phi_G(0.01769) &= -0.07^\circ - 66.77^\circ = -66.84^\circ \\
+    \phi_{PI}(0.01769) &= -90^\circ + \tan^{-1}\left(\frac{0.01769}{0.1}\right) = -79.97^\circ
+\end{align*}
+The required phase addition from the D-action zero is:
+\begin{align*}
+    \phi_{add}(\omega_s) &= -121.42^\circ - (-66.84^\circ) - (-79.97^\circ) = +25.39^\circ
+\end{align*}
+
+The D-action zero $z_1$ is located to provide exactly $25.39^\circ$ of phase:
+\begin{align*}
+    \tan(25.39^\circ) &= \frac{0.01769}{z_1} \implies z_1 = 0.03727
+\end{align*}
+The controller gain $K_{cPID}$ is calculated to force unity magnitude at $\omega_s$:
+\begin{align*}
+    |G_{11}(j0.01769)| \times \frac{K_{cPID}|j0.01769 + 0.03727||j0.01769 + 0.1|}{|j0.01769|} &= 1 \\
+    6.121 \times K_{cPID} \times \frac{0.04126 \times 0.10155}{0.01769} &= 1 \implies K_{cPID} = 0.6901
+\end{align*}
+
+Expanding the controller transfer function yields the parallel PID gains:
+\begin{align*}
+    G_{c11}(s) &= 0.6901 \frac{(s + 0.03727)(s + 0.1)}{s} = 0.6901s + 0.0947 + \frac{0.00257}{s}
+\end{align*}
+\textbf{Final Gains for \texorpdfstring{$G_{11}$}{G11}:} $K_p = 0.0947$, $K_i = 0.00257$, $K_d = 0.6901$
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+\subsection{PID Controller Design for \texorpdfstring{$G_{22}(s)$}{G22(s)}}
+
+For a target rise time of $T_r = 122.55$ s and identical $10\%$ overshoot ($\zeta = 0.591$, $\Phi_M = 58.58^\circ$), the bandwidth requirements shift:
+\begin{align*}
+    \omega_n &= \frac{1.8316}{122.55} = 0.01495 \text{ rad/s} \\
+    \omega_{BW} &= 0.01495 \times 1.160 = 0.01734 \text{ rad/s}
+\end{align*}
+
+With $z_2 = 0.1$, the new phase-margin frequency is:
+\begin{align*}
+    \omega_s &= 0.8 \times 0.01734 = 0.01387 \text{ rad/s}
+\end{align*}
+
+The required total loop phase is identical: $\phi_{required} = -121.42^\circ$. Evaluating the $G_{22}$ plant and PI controller at the new $\omega_s$:
+\begin{align*}
+    \phi_G(0.01387) &= -66.61^\circ (\text{Core}) - 0.12^\circ (\text{Delay}) = -66.73^\circ \\
+    \phi_{PI}(0.01387) &= -90^\circ + \tan^{-1}\left(\frac{0.01387}{0.1}\right) = -82.10^\circ
+\end{align*}
+The required phase addition is:
+\begin{align*}
+    \phi_{add}(\omega_s) &= -121.42^\circ - (-66.73^\circ) - (-82.10^\circ) = +27.41^\circ
+\end{align*}
+
+The D-action zero $z_1$ is located to provide $27.41^\circ$ of phase:
+\begin{align*}
+    \tan(27.41^\circ) &= \frac{0.01387}{z_1} \implies z_1 = 0.02674
+\end{align*}
+The overall controller gain $K_{cPID}$ is found via unity magnitude mapping:
+\begin{align*}
+    |G_{22}(j0.01387)| \times \frac{K_{cPID}|j0.01387 + 0.02674||j0.01387 + 0.1|}{|j0.01387|} &= 1 \\
+    3.885 \times K_{cPID} \times \frac{0.03013 \times 0.10096}{0.01387} &= 1 \implies K_{cPID} = 1.174
+\end{align*}
+
+Expanding the controller polynomial yields:
+\begin{align*}
+    G_{c22}(s) &= 1.174 \frac{(s + 0.02674)(s + 0.1)}{s} = 1.174s + 0.1488 + \frac{0.00314}{s}
+\end{align*}
+\textbf{Final Gains for \texorpdfstring{$G_{22}$}{G22}:} $K_p = 0.1488$, $K_i = 0.00314$, $K_d = 1.174$
 
 \newcommand\PlotPicture[3]{
     \begin{figure}[H]
