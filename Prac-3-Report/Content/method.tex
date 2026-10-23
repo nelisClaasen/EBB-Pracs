@@ -177,15 +177,6 @@ Expanding the controller polynomial yields:
 
 \newpage
 
-\newcommand\PlotPicture[3]{
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.9\textwidth]{Images/#1}
-        \caption{#2}
-        \label{#3}
-    \end{figure}
-    }
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{Images/G22_Freq_Confirm.pdf}
@@ -223,6 +214,15 @@ Figure \ref{fig:g22_step} compares the normalised step response of the open-loop
 The closed-loop rise time of $107.47$ s represents a $3.42\times$ reduction from the open-loop rise time of $367.15$ s, exceeding the required threefold specification. The overshoot of $17.10\%$ is higher than the target of $10\%$. This is a known limitation of the frequency response design method, as the procedure assumes a second-order closed-loop approximation. The actual closed-loop is higher order due to the PID zeros, which increase the overshoot beyond what the damping ratio alone predicts. The zero steady-state error is confirmed by the DC gain of unity, achieved through the integrator in the PID controller.
 
 \newpage
+
+\newcommand\PlotPicture[3]{%
+    \begin{figure}[H]%
+        \centering%
+        \includegraphics[width=0.9\textwidth]{Images/#1}%
+        \caption{#2}%
+        \label{#3}%
+    \end{figure}%
+    }
 
 \subsection{Root Locus Technique for G11}
     
@@ -399,8 +399,9 @@ The following table compares the open loop and closed loop step response informa
 Analysing the results for the controller design for $G_{11}$ shows how the frequency response technique yielded the worse theoretical step response characteristics. With the frequency response having an overshoot that is $7.26\%$ over the desired $10\%$, and the root locus technique having an overshoot that is $3.75\%$ over the desired $10\%$.
 
 Similarly, even though both controller designs have a rise time that is less than the desired $96.59~\mathrm{sec}$, the root locus design had a rise time that is $25.50~\mathrm{sec}$ faster, while the frequency response design had a rise time that is $11.30~\mathrm{sec}$ faster.
-
 The root locus design also has a $0.00\%$ undershoot, while the frequency response design has a undershoot of $8.86\%$.
+
+As seen above, even though both controller designs meet the rise time requirements, they both fail in exactly reaching/exceeding the overshoot specification. This is due to both design techniques using second order approximations to find design points, while the actual system has a higher order due to the pole and zeros introduced by the PID controller. The effect of the PID controller zeros is easily seen on the root locus plot~\ref{fig:root_locus_g11} where the zero $z_1 = 0.0295055$ is only $0.0295055 - 0.01121 = 0.0182955$ away from the real component of the design point.
 
 \begin{table}[H]
     \caption{Table comparing controller design parameters for different PID controller designs.}
@@ -420,10 +421,9 @@ The root locus design also has a $0.00\%$ undershoot, while the frequency respon
 
 \subsubsection{Comparison of Controllers Designed for \texorpdfstring{$G_{22}(s)$}{G22(s)} }
 
-Analysing the results for the controller design for $G_{22}$ shows how the frequency response technique yielded the worse theoretical step response characteristics. With the frequency response having an overshoot that is $7.10\%$ over the desired $10\%$, and the root locus technique having an overshoot that is $4.07\%$ over the desired $10\%$.
+Analysing the results for the controller design for $G_{22}$ shows how the frequency response technique again yielded the worse theoretical step response characteristics than the root locus technique. With the frequency response design having an overshoot that is $7.10\%$ over the desired $10\%$, and the root locus design having an overshoot that is $4.07\%$ over the desired $10\%$.
 
-Similarly, even though both controller designs have a rise time that is less than the desired $122.55~\mathrm{sec}$, the root locus design had a rise time that is $31.91~\mathrm{sec}$ faster, while the frequency response design had a rise time that is $15.08~\mathrm{sec}$ faster.
-
+Again, even though both controller designs have a rise time that is less than the desired $122.55~\mathrm{sec}$, the root locus design had a rise time that is $31.91~\mathrm{sec}$ faster, while the frequency response design had a rise time that is $15.08~\mathrm{sec}$ faster.
 The root locus design also has a $0.00\%$ undershoot, while the frequency response design has a undershoot of $7.40\%$.
 
 \begin{table}[H]
