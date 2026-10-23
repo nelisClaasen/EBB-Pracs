@@ -75,7 +75,7 @@ G_closed = feedback(controller * plant, 1);
 
 %Plot ideal 2nd order response with controlled tf.
 figure;
-hold on;
+hold on; grid on;
 stepplot(G_closed, opts, Name="Closed Loop", LineWidth=2);
 stepplot(Second_order_approx/dcgain(Second_order_approx), opts, Name="Open Loop", LineWidth=2);
 legend('Location','best', FontSize=20);
