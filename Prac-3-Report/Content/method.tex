@@ -103,7 +103,7 @@ To confirm the design, the bode plot of the open-loop system was plotted and the
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{Images/G11_Freq_Step.pdf}
+    \includegraphics[width=0.9\textwidth]{Images/G11_Freq_Step.pdf}
     \caption{G11 Normalized Open-Loop vs Closed-Loop Step Response.}
     \label{fig:g11_step}
 \end{figure}
@@ -193,13 +193,16 @@ Expanding the controller polynomial yields:
     \label{fig:g22_bode}
 \end{figure}
 
+Figure \ref{fig:g22_bode} confirms the designed phase margin of $58.5^\circ$ at the gain crossover frequency of $0.0139$ rad/s. The gain margin is infinite, which is expected for a first-order plant with a PID controller, as the loop phase never reaches $-180^\circ$. The phase peak visible above $-90^\circ$ is the contribution of the D-action zero $z_1$, which adds the phase lead required to meet the phase margin specification.
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{Images/G22_Freq_Step.pdf}
+    \includegraphics[width=0.9\textwidth]{Images/G22_Freq_Step.pdf}
     \caption{G22 Normalized Open-Loop vs Closed-Loop Step Response.}
     \label{fig:g22_step}
 \end{figure}
 
+Figure \ref{fig:g22_step} compares the normalised step response of the open-loop plant and the closed-loop system with the CFR22 controller. The closed-loop system achieves a significantly faster rise time relative to the open-loop plant, satisfying the threefold reduction specification. The initial undershoot observed in the closed-loop response is caused by the dead time approximation, which introduces a right-half-plane zero into the loop. The closed-loop response converges to unity steady-state value, confirming zero steady-state error as provided by the integrator in the PID controller.
 
 \begin{table}[H]
     \caption{Table comparing open vs closed loop step response characteristics of G22}
@@ -216,6 +219,8 @@ Expanding the controller polynomial yields:
         \bottomrule
     \end{tblr}
 \end{table}
+
+The closed-loop rise time of $107.47$ s represents a $3.42\times$ reduction from the open-loop rise time of $367.15$ s, exceeding the required threefold specification. The overshoot of $17.10\%$ is higher than the target of $10\%$. This is a known limitation of the frequency response design method, as the procedure assumes a second-order closed-loop approximation. The actual closed-loop is higher order due to the PID zeros, which increase the overshoot beyond what the damping ratio alone predicts. The zero steady-state error is confirmed by the DC gain of unity, achieved through the integrator in the PID controller.
 
 \newpage
 
@@ -303,8 +308,6 @@ The following table compares the open loop and closed loop step response informa
     \end{tblr}
 \end{table}
 
-\newpage
-
 \subsection{Root Locus Technique for G22}
 
 For the transfer function $G_{22}$ using equation [\ref{eq:first_order_Tr}] the current rise time was found to be $\approx 367.65~\mathrm{sec}$. Therefore, the target rise time is $122.55~\mathrm{sec}$.
@@ -390,4 +393,51 @@ The following table compares the open loop and closed loop step response informa
     \end{tblr}
 \end{table}
 
+\subsection{Simulation Results Discussion}
+\subsubsection{Comparison of Controllers Designed for \texorpdfstring{$G_{11}(s)$}{G11(s)} }
 
+Analysing the results for the controller design for $G_{11}$ shows how the frequency response technique yielded the worse theoretical step response characteristics. With the frequency response having an overshoot that is $7.26\%$ over the desired $10\%$, and the root locus technique having an overshoot that is $3.75\%$ over the desired $10\%$.
+
+Similarly, even though both controller designs have a rise time that is less than the desired $96.59~\mathrm{sec}$, the root locus design had a rise time that is $25.50~\mathrm{sec}$ faster, while the frequency response design had a rise time that is $11.30~\mathrm{sec}$ faster.
+
+The root locus design also has a $0.00\%$ undershoot, while the frequency response design has a undershoot of $8.86\%$.
+
+\begin{table}[H]
+    \caption{Table comparing controller design parameters for different PID controller designs.}
+    \begin{tblr}{colspec={X|XXX}, row{even}={bg = gray!20}}
+        \toprule
+        Step Response Parameter & Open Loop & Frequency Response Technique & Root Locus Technique\\
+        \midrule
+        Rise Time (s) & 289.08 & 85.29 & 71.09 \\ 
+        Transient Time (s) & 514.89 & 432.80 & 263.99 \\ 
+        Settling Time (s) & 514.89 & 441.73 & 263.99 \\ 
+        Overshoot (\%) & 0.00 & 17.26 & 13.75 \\ 
+        Undershoot (\%) & -0.00 & 8.86 & -0.00 \\ 
+        Peak Time (s) & 963.45 & 176.04 & 148.79 \\ 
+        \bottomrule
+    \end{tblr}
+\end{table}
+
+\subsubsection{Comparison of Controllers Designed for \texorpdfstring{$G_{22}(s)$}{G22(s)} }
+
+Analysing the results for the controller design for $G_{22}$ shows how the frequency response technique yielded the worse theoretical step response characteristics. With the frequency response having an overshoot that is $7.10\%$ over the desired $10\%$, and the root locus technique having an overshoot that is $4.07\%$ over the desired $10\%$.
+
+Similarly, even though both controller designs have a rise time that is less than the desired $122.55~\mathrm{sec}$, the root locus design had a rise time that is $31.91~\mathrm{sec}$ faster, while the frequency response design had a rise time that is $15.08~\mathrm{sec}$ faster.
+
+The root locus design also has a $0.00\%$ undershoot, while the frequency response design has a undershoot of $7.40\%$.
+
+\begin{table}[H]
+    \caption{Table comparing controller design parameters for different PID controller designs.}
+    \begin{tblr}{colspec={X|XXX}, row{even}={bg = gray!20}}
+        \toprule
+        Step Response Parameter & Open Loop & Frequency Response Technique & Root Locus Technique\\
+        \midrule
+        Rise Time (s) & 367.15 & 107.47 & 90.64 \\ 
+        Transient Time (s) & 653.90 & 548.75 & 335.60 \\ 
+        Settling Time (s) & 653.90 & 559.16 & 335.60 \\ 
+        Overshoot (\%) & 0.00 & 17.10 & 14.07 \\ 
+        Undershoot (\%) & -0.00 & 7.40 & -0.00 \\ 
+        Peak Time (s) & 1300.59 & 224.25  & 188.79 \\ 
+        \bottomrule
+    \end{tblr}
+\end{table}

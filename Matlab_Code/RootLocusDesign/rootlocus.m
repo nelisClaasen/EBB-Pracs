@@ -49,7 +49,7 @@ zeta = 0.5912;
 
 G11_SecondOrder = (omega_n^2)/(s^2 + 2*zeta*omega_n*s + omega_n^2);
 
-plotStep(G11, G_c11, G11, "Open Loop vs PID Closed Loop Step Response for G11", "G11_time.pdf");
+plotStep(G11, G_c11, G11, "Normalized Open Loop vs PID Closed Loop Step Response for G11", "G11_time.pdf");
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% For G22 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 G_c22 = 1.90571 * ((s + 0.1)*(s + 0.0221733)/s);
@@ -60,7 +60,7 @@ zeta = 0.5912;
 
 G22_SecondOrder = (omega_n^2)/(s^2 + 2*zeta*omega_n*s + omega_n^2);
 
-plotStep(G22, G_c22, G22, "Open Loop vs PID Closed Loop Step Response for G22", "G22_time.pdf");
+plotStep(G22, G_c22, G22, "Normalized Open Loop vs PID Closed Loop Step Response for G22", "G22_time.pdf");
 
 function plotStep(plant, controller, Second_order_approx, figName, fileSaveName)
 
@@ -75,7 +75,7 @@ G_closed = feedback(controller * plant, 1);
 
 %Plot ideal 2nd order response with controlled tf.
 figure;
-hold on;
+hold on; grid on;
 stepplot(G_closed, opts, Name="Closed Loop", LineWidth=2);
 stepplot(Second_order_approx/dcgain(Second_order_approx), opts, Name="Open Loop", LineWidth=2);
 legend('Location','best', FontSize=20);
