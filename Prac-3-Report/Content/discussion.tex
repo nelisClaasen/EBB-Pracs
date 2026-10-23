@@ -38,9 +38,9 @@ Table \ref{tab:pid_comparison} summarises the PID coefficients obtained for $G_{
     \centering
     \caption{Comparison of PID coefficients across design methods}
     \label{tab:pid_comparison}
-    \begin{tblr}{colspec={X|XX|XX}, row{even}={bg=gray!20}}
+    \begin{tblr}{colspec={Q[l]|Q[c]Q[c]|Q[c]Q[c]}, row{even}={bg=gray!20}}
         \toprule
-        & \multicolumn{2}{c|}{\textbf{$G_{11}$ (PWM1 $\to$ T1)}} & \multicolumn{2}{c}{\textbf{$G_{22}$ (PWM2 $\to$ T2)}} \\
+        & \SetCell[c=2]{c} \textbf{$G_{11}$ (PWM1 $\to$ T1)} & & \SetCell[c=2]{c} \textbf{$G_{22}$ (PWM2 $\to$ T2)} & \\
         \textbf{Coefficient} & \textbf{Freq. Response} & \textbf{Root Locus} & \textbf{Freq. Response} & \textbf{Root Locus} \\
         \midrule
         $K_p$ & 0.0947 & 0.1527 & 0.1488 & 0.2328 \\
@@ -50,12 +50,6 @@ Table \ref{tab:pid_comparison} summarises the PID coefficients obtained for $G_{
     \end{tblr}
 \end{table}
 
-A consistent pattern is visible across both plants: the root locus method produces larger $K_p$, $K_i$, and $K_d$ values than the frequency response method. This difference stems directly from how each method determines the controller gain $K_c$.
+A consistent pattern is visible across both plants: the root locus method produces larger $K_p$, $K_i$, and $K_d$ values than the frequency response method. Since $K_d = K_c$ and both $K_p = K_c(z_1+z_2)$ and $K_i = K_c z_1 z_2$ scale directly with $K_c$, this difference originates in how each method determines $K_c$. The root locus method enforces the magnitude condition at the complex design point $s_d$, where the plant has lower magnitude, requiring a larger $K_c$. The frequency response method enforces the same condition at the real frequency $\omega_s = 0.8\omega_{BW}$, where the plant magnitude is higher, so a smaller $K_c$ suffices. For $G_{22}$ this gives $K_c = 1.906$ (root locus) versus $K_c = 1.174$ (frequency response), a factor of $1.6\times$.
 
-In both methods the PID controller takes the ideal form $G_c(s) = K_c(s+z_1)(s+z_2)/s$, where $K_d = K_c$, $K_p = K_c(z_1+z_2)$ and $K_i = K_c \cdot z_1 z_2$. Since the proportional and integral gains scale with $K_c$, any difference in $K_c$ propagates into all three coefficients. The root locus method yields $K_c = 1.179$ for $G_{11}$ versus $K_c = 0.690$ for the frequency response method --- a factor of approximately $1.7\times$ --- and similarly $K_c = 1.906$ versus $K_c = 1.174$ for $G_{22}$, again roughly $1.6\times$ larger.
-
-The root locus method determines $K_c$ by enforcing the magnitude condition $|K_c G_c(s_d) G_p(s_d)| = 1$ at the complex design point $s_d = -\zeta\omega_n \pm j\omega_d$. At this point in the $s$-plane the plant and unscaled controller have a combined magnitude less than one, so $K_c > 1$ is required to bring the product to unity. The frequency response method instead enforces $|K_c G_c(j\omega_s) G_p(j\omega_s)| = 1$ at the real frequency $\omega_s = 0.8\omega_{BW}$ on the imaginary axis. Because the plant magnitude at $\omega_s$ is larger than at the complex point $s_d$ (the plant has lower gain at higher frequencies, and the imaginary axis is closer to the origin), the normalisation requires a smaller $K_c$.
-
-Additionally, the D-action zeros differ between the two methods --- $z_1 = 0.03727$ (frequency response) versus $z_1 = 0.02951$ (root locus) for $G_{11}$, and $z_1 = 0.02674$ versus $z_1 = 0.02217$ for $G_{22}$. Since the PI zero $z_2 = 0.1$ is identical in both methods, the difference in $z_1$ slightly changes $(z_1 + z_2)$ and therefore $K_p$, and changes $z_1 z_2$ and therefore $K_i$, amplifying the overall coefficient difference beyond what $K_c$ alone accounts for.
-
-Despite these numerical differences, both sets of coefficients produce controllers that meet the design specifications. The higher gains of the root locus controllers result in slightly more aggressive transient behaviour — shorter rise time and slightly lower overshoot — consistent with the higher closed-loop bandwidth implied by a larger $K_c$. In the physical implementation both controller pairs performed within acceptable bounds, confirming that the plant is robust to this level of gain variation between the two design methods.
+The D-action zeros also differ slightly between the two methods — $z_1 = 0.02674$ (frequency response) versus $z_1 = 0.02217$ (root locus) for $G_{22}$ — further amplifying the coefficient differences through the $K_p$ and $K_i$ expressions. Despite these numerical differences, both controller pairs met the design specifications and performed comparably in the physical implementation, confirming that the plant is robust to this level of gain variation between the two design methods.
