@@ -152,3 +152,47 @@ legend('Controller 1', 'Controller  2', 'Location', 'best', 'FontSize', 20);
 grid on;
 set(gca, 'FontSize', 20);
 
+
+%Calculate overshoot and rise time
+
+% --- Temp 1: State 1 (0 to 600 seconds) ---
+idx_t1_s1 = (t >= 0) & (t < 600);
+t_t1_s1 = t(idx_t1_s1);
+t_t1_s1 = t_t1_s1 - t_t1_s1(1); % Shift time to start at 0
+y_t1_s1 = temp1(idx_t1_s1);
+stats_t1_s1 = stepinfo(y_t1_s1, t_t1_s1, y_t1_s1(end), 'InitialValue', y_t1_s1(1));
+
+fprintf('--- Temp 1 (G11) ---\n');
+fprintf('State 1 (0-600s) Overshoot: %.2f%%\n', stats_t1_s1.Overshoot);
+fprintf('State 1 (0-600s) Rise Time: %.2f seconds\n\n', stats_t1_s1.RiseTime);
+
+% --- Temp 1: State 2 (600 to 1200 seconds) ---
+idx_t1_s2 = (t >= 600) & (t < 1200);
+t_t1_s2 = t(idx_t1_s2);
+t_t1_s2 = t_t1_s2 - t_t1_s2(1); 
+y_t1_s2 = temp1(idx_t1_s2);
+stats_t1_s2 = stepinfo(y_t1_s2, t_t1_s2, y_t1_s2(end), 'InitialValue', y_t1_s2(1));
+
+fprintf('State 2 (600-1200s) Overshoot: %.2f%%\n', stats_t1_s2.Overshoot);
+fprintf('State 2 (600-1200s) Rise Time: %.2f seconds\n\n', stats_t1_s2.RiseTime);
+
+% --- Temp 2: State 1 (0 to 600 seconds) ---
+idx_t2_s1 = (t >= 0) & (t < 600);
+t_t2_s1 = t(idx_t2_s1);
+t_t2_s1 = t_t2_s1 - t_t2_s1(1); 
+y_t2_s1 = temp2(idx_t2_s1);
+stats_t2_s1 = stepinfo(y_t2_s1, t_t2_s1, y_t2_s1(end), 'InitialValue', y_t2_s1(1));
+
+fprintf('--- Temp 2 (G22) ---\n');
+fprintf('State 1 (0-600s) Overshoot: %.2f%%\n', stats_t2_s1.Overshoot);
+fprintf('State 1 (0-600s) Rise Time: %.2f seconds\n\n', stats_t2_s1.RiseTime);
+
+% --- Temp 2: State 3 (1200 to 1500 seconds) ---
+idx_t2_s3 = (t >= 1200) & (t <= 1500);
+t_t2_s3 = t(idx_t2_s3);
+t_t2_s3 = t_t2_s3 - t_t2_s3(1); 
+y_t2_s3 = temp2(idx_t2_s3);
+stats_t2_s3 = stepinfo(y_t2_s3, t_t2_s3, y_t2_s3(end), 'InitialValue', y_t2_s3(1));
+
+fprintf('State 3 (1200-1500s) Overshoot: %.2f%%\n', stats_t2_s3.Overshoot);
+fprintf('State 3 (1200-1500s) Rise Time: %.2f seconds\n', stats_t2_s3.RiseTime);
