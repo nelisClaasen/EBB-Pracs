@@ -120,7 +120,13 @@ temp2 = out.temp.Data(:,2);
 
 figure(5);
 plot(t, temp1, 'b-', 'LineWidth', 2); hold on;
-plot(t, temp2, 'r-', 'LineWidth', 2); hold off;
+plot(t, temp2, 'r-', 'LineWidth', 2); 
+
+
+xline(600, 'k--', 'LineWidth', 2);
+xline(1200, 'k--', 'LineWidth', 2);
+
+hold off;
 
 title(''); 
 xlabel('Time (seconds)');
@@ -129,11 +135,17 @@ legend('Temperature Measurement 1', 'Temperature Measurement 2', 'Location', 'be
 grid on;
 set(gca, 'FontSize', 20);
 
+
 control1 = out.control.Data(:,1);
 control2 = out.control.Data(:,2);
 figure(6);
 plot(t, control1, 'b-', 'LineWidth', 2); hold on;
-plot(t, control2, 'r--', 'LineWidth', 2); hold off;
+plot(t, control2, 'r--', 'LineWidth', 2);
+
+xline(600, 'k--', 'LineWidth', 2);
+xline(1200, 'k--', 'LineWidth', 2);
+
+hold off;
 xlabel('Time (seconds)');
 ylabel('Control Input');
 legend('Control Input 1', 'Control Input 2', 'Location', 'best', 'FontSize', 20);
