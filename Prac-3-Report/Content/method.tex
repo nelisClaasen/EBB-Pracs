@@ -39,7 +39,7 @@ The following table contains the derived transfer functions that were used to si
 
 \end{table}
 
-\subsection{PID Controller Design for \texorpdfstring{$G_{11}(s)$}{G11(s)}}
+\subsection{PID Controller Design for \texorpdfstring{$G_{11}(s)$}{G11(s)} Using the Frequency Design Techniques}
 
 The design specifications are a $10\%$ overshoot and a rise time of $T_r = 96.1$ s. The damping ratio $\zeta$ is calculated as:
 \begin{align*}
@@ -90,11 +90,53 @@ Expanding the controller transfer function yields the parallel PID gains:
 \end{align*}
 \textbf{Final Gains for \texorpdfstring{$G_{11}$}{G11}:} $K_p = 0.0947$, $K_i = 0.00257$, $K_d = 0.6901$
 
+To confirm the design, the bode plot of the open-loop system was plotted and the crossover frequency was compared to the designed crossover frequency.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Images/G11_Freq_Confirm.pdf}
+    \caption{G11 Open-Loop Bode Plot verifying the $58.6^\circ$ Phase Margin at $0.0177$ rad/s.}
+    \label{fig:g11_bode}
+\end{figure}
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Images/G11_Freq_Step.pdf}
+    \caption{G11 Normalized Open-Loop vs Closed-Loop Step Response.}
+    \label{fig:g11_step}
+\end{figure}
+
+Figure \ref{fig:g11_step} compares the step response of the open-loop and closed-loop system. It can be observed that the closed-loop system
+yielded a faster rise time compared to the open loop system.
+
+The following table compares the step response information of the closed-loop and open-loop system.
+
+\begin{table}[H]
+    \caption{Table comparing open vs closed loop step response characteristics of G11}
+    \begin{tblr}{colspec={X|XX}, row{even}={bg = gray!20}}
+        \toprule
+        Step Response Parameter & Open Loop & Closed Loop \\
+        \midrule
+        Rise Time (s) & 289.08 & 85.29 \\ 
+        Transient Time (s) & 514.89 & 432.80 \\ 
+        Settling Time (s) & 514.89 & 441.73 \\ 
+        Overshoot (\%) & 0.00 & 17.26 \\ 
+        Undershoot (\%) & 0.00 & 8.86 \\ 
+        Peak Time (s) & 963.45 & 176.04 \\ 
+        \bottomrule
+    \end{tblr}
+\end{table}
+
+
+
+
 \vspace{0.5cm}
 \hrule
 \vspace{0.5cm}
 
-\subsection{PID Controller Design for \texorpdfstring{$G_{22}(s)$}{G22(s)}}
+\subsection{PID Controller Design for \texorpdfstring{$G_{22}(s)$}{G22(s)} Using the Frequency Design Techniques}
 
 For a target rise time of $T_r = 122.55$ s and identical $10\%$ overshoot ($\zeta = 0.591$, $\Phi_M = 58.58^\circ$), the bandwidth requirements shift:
 \begin{align*}
@@ -141,6 +183,37 @@ Expanding the controller polynomial yields:
         \label{#3}
     \end{figure}
     }
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Images/G22_Freq_Confirm.pdf}
+    \caption{G22 Open-Loop Bode Plot verifying the $58.5^\circ$ Phase Margin at $0.0139$ rad/s.}
+    \label{fig:g22_bode}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Images/G22_Freq_Step.pdf}
+    \caption{G22 Normalized Open-Loop vs Closed-Loop Step Response.}
+    \label{fig:g22_step}
+\end{figure}
+
+
+\begin{table}[H]
+    \caption{Table comparing open vs closed loop step response characteristics of G22}
+    \begin{tblr}{colspec={X|XX}, row{even}={bg = gray!20}}
+        \toprule
+        Step Response Parameter & Open Loop & Closed Loop \\
+        \midrule
+        Rise Time (s) & 367.15 & 107.47 \\ 
+        Transient Time (s) & 653.90 & 548.75 \\ 
+        Settling Time (s) & 653.90 & 559.16 \\ 
+        Overshoot (\%) & 0.00 & 17.10 \\ 
+        Undershoot (\%) & 0.00 & 7.40 \\ 
+        Peak Time (s) & 1223.60 & 224.25 \\ 
+        \bottomrule
+    \end{tblr}
+\end{table}
 
 \newpage
 
