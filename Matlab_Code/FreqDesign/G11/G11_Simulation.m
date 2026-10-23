@@ -45,36 +45,71 @@ stepinfo(G22_Final)
 disp('--- G22 Closed-Loop Step Info ---');
 stepinfo(T22)
 
-% 5. Verification Graphs (Forced to 12pt font)
+
+set(groot, 'defaultAxesFontSize', 14); 
+
+
+% 5. Verification Graphs (Forced to 14pt font for export scaling)
 
 % --- G11 Plots ---
 figure(1);
 step(G11_Normalized, 'b--', T11, 'r-', 800); 
-title('G11: Normalized Open-Loop vs Closed-Loop Step Response');
-xlabel('Time');
-ylabel('Amplitude');
-legend('Normalized Open-Loop (Plant)', 'Closed-Loop', 'Location', 'best');
+legend('Normalized Open-Loop (Plant)', 'Closed-Loop', 'Location', 'best', 'FontSize', 14);
 grid on;
-set(findall(gcf, '-property', 'FontSize'), 'FontSize', 12); % Applies 12pt to everything in Figure 1
+h1 = gcr; 
+opt1 = getoptions(h1);
+opt1.Title.String = ''; 
+opt1.TickLabel.FontSize = 14;
+opt1.XLabel.FontSize = 14;
+opt1.YLabel.FontSize = 14;
+setoptions(h1, opt1);
 
 figure(2);
+[Gm1, Pm1, Wcg1, Wcp1] = margin(L11);
 margin(L11);
-title('G11: Open-Loop Bode Plot with Phase Margin');
 grid on;
-set(findall(gcf, '-property', 'FontSize'), 'FontSize', 12); % Applies 12pt to everything in Figure 2
+h2 = gcr;
+opt2 = getoptions(h2);
+opt2.Title.String = ''; 
+opt2.TickLabel.FontSize = 14;
+opt2.XLabel.FontSize = 14;
+opt2.YLabel.FontSize = 14;
+setoptions(h2, opt2);
+
+% Create floating text box for the phase margin info
+txt1 = sprintf('P_m = %.1f^\\circ at \\omega = %.4f rad/s', Pm1, Wcp1);
+annotation('textbox', [0.55, 0.15, 0.35, 0.07], 'String', txt1, ...
+    'BackgroundColor', 'white', 'EdgeColor', 'black', ...
+    'FitBoxToText', 'on', 'FontSize', 14);
 
 % --- G22 Plots ---
 figure(3);
 step(G22_Normalized, 'b--', T22, 'r-', 800); 
-title('G22: Normalized Open-Loop vs Closed-Loop Step Response');
-xlabel('Time');
-ylabel('Amplitude');
-legend('Normalized Open-Loop (Plant)', 'Closed-Loop', 'Location', 'best');
+legend('Normalized Open-Loop (Plant)', 'Closed-Loop', 'Location', 'best', 'FontSize', 14);
 grid on;
-set(findall(gcf, '-property', 'FontSize'), 'FontSize', 12); % Applies 12pt to everything in Figure 3
+h3 = gcr; 
+opt3 = getoptions(h3);
+opt3.Title.String = ''; 
+opt3.TickLabel.FontSize = 14;
+opt3.XLabel.FontSize = 14;
+opt3.YLabel.FontSize = 14;
+setoptions(h3, opt3);
 
 figure(4);
+[Gm2, Pm2, Wcg2, Wcp2] = margin(L22);
 margin(L22);
-title('G22: Open-Loop Bode Plot with Phase Margin');
 grid on;
-set(findall(gcf, '-property', 'FontSize'), 'FontSize', 12); % Applies 12pt to everything in Figure 4
+h4 = gcr;
+opt4 = getoptions(h4);
+opt4.Title.String = ''; 
+opt4.TickLabel.FontSize = 14;
+opt4.XLabel.FontSize = 14;
+opt4.YLabel.FontSize = 14;
+setoptions(h4, opt4);
+
+% Create floating text box for the phase margin info
+txt2 = sprintf('P_m = %.1f^\\circ at \\omega = %.4f rad/s', Pm2, Wcp2);
+annotation('textbox', [0.55, 0.15, 0.35, 0.07], 'String', txt2, ...
+    'BackgroundColor', 'white', 'EdgeColor', 'black', ...
+    'FitBoxToText', 'on', 'FontSize', 14);
+
