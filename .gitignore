@@ -61,7 +61,7 @@
 # ---------------------------------------------------
 # Uncomment the line below if you do NOT want to track 
 # the generated PDFs in your repository.
-*.pdf
+
 
 # MATLAB Autosaves and Backups
 *.asv
@@ -98,4 +98,5 @@ codegen/
 .DS_Store
 Thumbs.db
 
-Prac-2-Report/report.pdf
+Prac-3-Report/EBB320_Group37_Prac3.pdf
+
