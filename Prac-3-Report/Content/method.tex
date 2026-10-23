@@ -193,6 +193,8 @@ Expanding the controller polynomial yields:
     \label{fig:g22_bode}
 \end{figure}
 
+Figure \ref{fig:g22_bode} confirms the designed phase margin of $58.5^\circ$ at the gain crossover frequency of $0.0139$ rad/s. The gain margin is infinite, which is expected for a first-order plant with a PID controller, as the loop phase never reaches $-180^\circ$. The phase peak visible above $-90^\circ$ is the contribution of the D-action zero $z_1$, which adds the phase lead required to meet the phase margin specification.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{Images/G22_Freq_Step.pdf}
@@ -200,6 +202,7 @@ Expanding the controller polynomial yields:
     \label{fig:g22_step}
 \end{figure}
 
+Figure \ref{fig:g22_step} compares the normalised step response of the open-loop plant and the closed-loop system with the CFR22 controller. The closed-loop system achieves a significantly faster rise time relative to the open-loop plant, satisfying the threefold reduction specification. The initial undershoot observed in the closed-loop response is caused by the dead time approximation, which introduces a right-half-plane zero into the loop. The closed-loop response converges to unity steady-state value, confirming zero steady-state error as provided by the integrator in the PID controller.
 
 \begin{table}[H]
     \caption{Table comparing open vs closed loop step response characteristics of G22}
@@ -216,6 +219,10 @@ Expanding the controller polynomial yields:
         \bottomrule
     \end{tblr}
 \end{table}
+
+The closed-loop rise time of $107.47$ s represents a $3.42\times$ reduction from the open-loop rise time of $367.15$ s, exceeding the required threefold specification. The overshoot of $17.10\%$ is higher than the target of $10\%$. This is a known limitation of the frequency response design method, as the procedure assumes a second-order closed-loop approximation. The actual closed-loop is higher order due to the PID zeros, which increase the overshoot beyond what the damping ratio alone predicts. The zero steady-state error is confirmed by the DC gain of unity, achieved through the integrator in the PID controller.
+
+\newpage
 
 \subsection{Root Locus Technique for G11}
     
