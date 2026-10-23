@@ -51,7 +51,7 @@ stepinfo(T22)
 figure(1);
 step(G11_Normalized, 'b--', T11, 'r-', 800); 
 title('G11: Normalized Open-Loop vs Closed-Loop Step Response');
-xlabel('Time (seconds)');
+xlabel('Time');
 ylabel('Amplitude');
 legend('Normalized Open-Loop (Plant)', 'Closed-Loop', 'Location', 'best');
 grid on;
@@ -67,7 +67,7 @@ set(findall(gcf, '-property', 'FontSize'), 'FontSize', 12); % Applies 12pt to ev
 figure(3);
 step(G22_Normalized, 'b--', T22, 'r-', 800); 
 title('G22: Normalized Open-Loop vs Closed-Loop Step Response');
-xlabel('Time (seconds)');
+xlabel('Time');
 ylabel('Amplitude');
 legend('Normalized Open-Loop (Plant)', 'Closed-Loop', 'Location', 'best');
 grid on;
