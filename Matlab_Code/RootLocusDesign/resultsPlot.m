@@ -7,22 +7,22 @@ PID_Freq_Data = readmatrix(filepath);
 PID_Freq_Step = PID_Freq_Data(10:end,1:5);
 
 y = PID_Root_Step(:, 1:2);
-time = PID_Root_Step(:, 5);
+time = PID_Root_Step(:, 5)/1000;
 pwms = PID_Root_Step(:, 3:4);
 tempName = "Measured Temperature Curve for Root Locus designed PID Controllers";
 inputName = "Measured Control Inputs for Root Locus designed PID Controllers";
 saveName = "PID_Root";
-trans_times = [567516, 1129700];
+trans_times = [567516, 1129700]/1000;
 
 plotResults(pwms, y, time, tempName, inputName, saveName, trans_times);
 
 y = PID_Freq_Step(:, 1:2);
-time = PID_Freq_Step(:, 5);
+time = PID_Freq_Step(:, 5)/1000;
 pwms = PID_Freq_Step(:, 3:4);
 tempName = "Measured Temperature Curve for Frequency Response designed PID Controllers";
 inputName = "Measured Control Inputs for Frequency Response designed PID Controllers";
 saveName = "PID_Freq";
-trans_times = [629974, 1010150];
+trans_times = [629974, 1010150]/1000;
 plotResults(pwms, y, time, tempName, inputName, saveName, trans_times);
 
 function plotResults(PWM_Input, dataY, time, figNameTemp, figNamePWM, saveName, state_trans_times)
