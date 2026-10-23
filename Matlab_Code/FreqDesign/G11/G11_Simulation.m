@@ -127,7 +127,7 @@ xline(600, 'k--', 'LineWidth', 2);
 xline(1200, 'k--', 'LineWidth', 2);
 
 hold off;
-
+5
 title(''); 
 xlabel('Time (seconds)');
 ylabel('Temperature (^\circ C)')
@@ -147,8 +147,8 @@ xline(1200, 'k--', 'LineWidth', 2);
 
 hold off;
 xlabel('Time (seconds)');
-ylabel('Control Input');
-legend('Control Input 1', 'Control Input 2', 'Location', 'best', 'FontSize', 20);
+ylabel('Controller Output');
+legend('Controller 1', 'Controller  2', 'Location', 'best', 'FontSize', 20);
 grid on;
 set(gca, 'FontSize', 20);
 
