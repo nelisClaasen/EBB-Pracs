@@ -103,7 +103,7 @@ To confirm the design, the bode plot of the open-loop system was plotted and the
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{Images/G11_Freq_Step.pdf}
+    \includegraphics[width=0.9\textwidth]{Images/G11_Freq_Step.pdf}
     \caption{G11 Normalized Open-Loop vs Closed-Loop Step Response.}
     \label{fig:g11_step}
 \end{figure}
@@ -197,7 +197,7 @@ Figure \ref{fig:g22_bode} confirms the designed phase margin of $58.5^\circ$ at 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{Images/G22_Freq_Step.pdf}
+    \includegraphics[width=0.9\textwidth]{Images/G22_Freq_Step.pdf}
     \caption{G22 Normalized Open-Loop vs Closed-Loop Step Response.}
     \label{fig:g22_step}
 \end{figure}
@@ -308,8 +308,6 @@ The following table compares the open loop and closed loop step response informa
     \end{tblr}
 \end{table}
 
-\newpage
-
 \subsection{Root Locus Technique for G22}
 
 For the transfer function $G_{22}$ using equation [\ref{eq:first_order_Tr}] the current rise time was found to be $\approx 367.65~\mathrm{sec}$. Therefore, the target rise time is $122.55~\mathrm{sec}$.
@@ -391,6 +389,29 @@ The following table compares the open loop and closed loop step response informa
         Overshoot (\%) & 0.00 & 14.07 \\ 
         Undershoot (\%) & -0.00 & -0.00 \\ 
         Peak Time (s) & 1300.59 & 188.79 \\ 
+        \bottomrule
+    \end{tblr}
+\end{table}
+
+\subsection{Simulation Results Discussion}
+\subsubsection{Comparison of Controllers Designed for \texorpdfstring{$G_{11}(s)$}{G11(s)} }
+
+Analysing the results for the controller design for $G_{11}$ shows how the frequency response technique yielded the worse theoretical step response characteristics. With the frequency response having an overshoot that is $7.26\%$ over the desired $10\%$, and the root locus technique having an overshoot that is $3.75\%$ over the desired $10\%$.
+
+Similarly, even though both controller designs have a rise time that is less than the desired $96.59~\mathrm{sec}$, the root locus design had a rise time that is $25.50~\mathrm{sec}$ faster, while the frequency response design had a rise time that is $11.30~\mathrm{sec}$ faster.
+
+\begin{table}[H]
+    \caption{Table comparing controller design parameters for different PID controller designs.}
+    \begin{tblr}{colspec={X|XXX}, row{even}={bg = gray!20}}
+        \toprule
+        Step Response Parameter & Open Loop & Frequency Response Technique & Root Locus Technique\\
+        \midrule
+        Rise Time (s) & 289.08 & 85.29 & 71.09 \\ 
+        Transient Time (s) & 514.89 & 432.80 & 263.99 \\ 
+        Settling Time (s) & 514.89 & 441.73 & 263.99 \\ 
+        Overshoot (\%) & 0.00 & 17.26 & 13.75 \\ 
+        Undershoot (\%) & -0.00 & 8.86 & -0.00 \\ 
+        Peak Time (s) & 963.45 & 176.04 & 148.79 \\ 
         \bottomrule
     \end{tblr}
 \end{table}

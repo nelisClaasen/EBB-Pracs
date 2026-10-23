@@ -1,18 +1,18 @@
 filepath = fullfile('..', 'DataPrac3', 'PID_root_V4.csv');
 PID_Root_Data = readmatrix(filepath);
-PID_Root_Step = PID_Root_Data(7920:end,1:5);
+PID_Root_Step = PID_Root_Data(10:end,1:5);
 
 filepath = fullfile('..', 'DataPrac3', 'PID_freq_V4.csv');
 PID_Freq_Data = readmatrix(filepath);
-PID_Freq_Step = PID_Freq_Data(6400:end,1:5);
+PID_Freq_Step = PID_Freq_Data(10:end,1:5);
 
 y = PID_Root_Step(:, 1:2);
 time = PID_Root_Step(:, 5);
 pwms = PID_Root_Step(:, 3:4);
 tempName = "Measured Temperature Curve for Root Locus designed PID Controllers";
 inputName = "Measured Control Inputs for Root Locus designed PID Controllers";
-saveName = "PID_Root"
-trans_times = [567516, 1129700]
+saveName = "PID_Root";
+trans_times = [567516, 1129700];
 
 plotResults(pwms, y, time, tempName, inputName, saveName, trans_times);
 
@@ -21,7 +21,7 @@ time = PID_Freq_Step(:, 5);
 pwms = PID_Freq_Step(:, 3:4);
 tempName = "Measured Temperature Curve for Frequency Response designed PID Controllers";
 inputName = "Measured Control Inputs for Frequency Response designed PID Controllers";
-saveName = "PID_Freq"
+saveName = "PID_Freq";
 trans_times = [629974, 1010150];
 plotResults(pwms, y, time, tempName, inputName, saveName, trans_times);
 
