@@ -71,16 +71,16 @@ grid on;
 h2 = gcr;
 opt2 = getoptions(h2);
 opt2.Title.String = ''; 
-opt2.TickLabel.FontSize = 14;
-opt2.XLabel.FontSize = 14;
-opt2.YLabel.FontSize = 14;
+opt2.TickLabel.FontSize = 20;
+opt2.XLabel.FontSize = 20;
+opt2.YLabel.FontSize = 20;
 setoptions(h2, opt2);
 
 % Create floating text box for the phase margin info
 txt1 = sprintf('P_m = %.1f^\\circ at \\omega = %.4f rad/s', Pm1, Wcp1);
 annotation('textbox', [0.55, 0.15, 0.35, 0.07], 'String', txt1, ...
     'BackgroundColor', 'white', 'EdgeColor', 'black', ...
-    'FitBoxToText', 'on', 'FontSize', 14);
+    'FitBoxToText', 'on', 'FontSize', 20);
 
 % --- G22 Plots ---
 figure(3);
@@ -102,14 +102,41 @@ grid on;
 h4 = gcr;
 opt4 = getoptions(h4);
 opt4.Title.String = ''; 
-opt4.TickLabel.FontSize = 14;
-opt4.XLabel.FontSize = 14;
-opt4.YLabel.FontSize = 14;
+opt4.TickLabel.FontSize = 20;
+opt4.XLabel.FontSize = 20;
+opt4.YLabel.FontSize = 20;
 setoptions(h4, opt4);
 
 % Create floating text box for the phase margin info
 txt2 = sprintf('P_m = %.1f^\\circ at \\omega = %.4f rad/s', Pm2, Wcp2);
 annotation('textbox', [0.55, 0.15, 0.35, 0.07], 'String', txt2, ...
     'BackgroundColor', 'white', 'EdgeColor', 'black', ...
-    'FitBoxToText', 'on', 'FontSize', 14);
+    'FitBoxToText', 'on', 'FontSize', 20);
+
+t = out.temp.Time;
+
+temp1 = out.temp.Data(:,1);
+temp2 = out.temp.Data(:,2);
+
+figure(5);
+plot(t, temp1, 'b-', 'LineWidth', 2); hold on;
+plot(t, temp2, 'r-', 'LineWidth', 2); hold off;
+
+title(''); 
+xlabel('Time (seconds)');
+ylabel('Temperature (^\circ C)')
+legend('Temperature Measurement 1', 'Temperature Measurement 2', 'Location', 'best', 'FontSize', 20);
+grid on;
+set(gca, 'FontSize', 20);
+
+control1 = out.control.Data(:,1);
+control2 = out.control.Data(:,2);
+figure(6);
+plot(t, control1, 'b-', 'LineWidth', 2); hold on;
+plot(t, control2, 'r--', 'LineWidth', 2); hold off;
+xlabel('Time (seconds)');
+ylabel('Control Input');
+legend('Control Input 1', 'Control Input 2', 'Location', 'best', 'FontSize', 20);
+grid on;
+set(gca, 'FontSize', 20);
 
