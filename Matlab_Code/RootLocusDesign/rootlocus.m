@@ -65,10 +65,10 @@ plotStep(G22, G_c22, G22, "Open Loop vs PID Closed Loop Step Response for G22", 
 function plotStep(plant, controller, Second_order_approx, figName, fileSaveName)
 
 opts = timeoptions('cstprefs');
-opts.Title.FontSize = 14;
-opts.XLabel.FontSize = 14;
-opts.YLabel.FontSize = 14;
-opts.TickLabel.FontSize = 10;
+opts.Title.FontSize = 20;
+opts.XLabel.FontSize = 20;
+opts.YLabel.FontSize = 20;
+opts.TickLabel.FontSize = 16;
 
 %Get feedback tf
 G_closed = feedback(controller * plant, 1);
@@ -78,7 +78,7 @@ figure;
 hold on;
 stepplot(G_closed, opts, Name="Closed Loop", LineWidth=2);
 stepplot(Second_order_approx/dcgain(Second_order_approx), opts, Name="Open Loop", LineWidth=2);
-legend('Location','best', FontSize=14);
+legend('Location','best', FontSize=20);
 title(figName);
 
 %Print out table comparing characteristics of the two.
@@ -97,7 +97,7 @@ for i = 1:numel(fields)
 end
 
 %Update font sizes.
-fontsize(gcf, 14, "points");
+fontsize(gcf, 20, "points");
 hold off;
 
 filepath = fullfile('..', '..', 'Prac-3-Report', 'Images', 'RootLocus', fileSaveName);
@@ -173,7 +173,7 @@ if ~isempty(bestLine)
 end
 
 %Update font sizes.
-fontsize(gcf, 14, "points");
+fontsize(gcf, 16, "points");
 hold off;
 
 filepath = fullfile('..', '..', 'Prac-3-Report', 'Images', 'RootLocus', fileSaveName);
