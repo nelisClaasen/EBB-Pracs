@@ -58,8 +58,8 @@ hold on; grid on;
 
 % Plot the PWM input signal.
 ylim([-0.1, 3.5])
-plot(time, movmean(PWM_Input(:, 1), 200), LineWidth=1.5);
-plot(time, movmean(PWM_Input(:, 2), 200), LineWidth=1.5);
+plot(time, movmean(PWM_Input(:, 1), 500), LineWidth=1.5);
+plot(time, movmean(PWM_Input(:, 2), 500), LineWidth=1.5);
 title(figNamePWM)
 legend('PWM Input 1', 'PWM Input 2', 'Location','best', FontSize=14);
 xlabel('Time (s)');

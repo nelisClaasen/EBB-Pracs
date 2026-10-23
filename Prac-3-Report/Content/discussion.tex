@@ -1,4 +1,31 @@
 \section{Discussion}
+\subsection{Frequency Response Technique}
+\begin{table}[H]
+    \centering
+    \caption{Comparison of Simulated vs. Measured Transient Performance for Frequency Response PID Controllers}
+    \begin{tblr}{colspec={X|XX|XX}, row{1,2}={font=\bfseries}, row{even}={bg=gray!20}}
+        \toprule
+        & \SetCell[c=2]{c} Overshoot (\%) & & \SetCell[c=2]{c} Rise Time (s) & \\
+        \cmidrule[lr]{2-3} \cmidrule[lr]{4-5}
+        State Transition & Simulated & Measured & Simulated & Measured \\
+        \midrule
+        State 1 ($G_{11}$) & 25.7 & 21.0 & 18.0 & x \\
+        State 1 ($G_{22}$) & 17.1 & 11.4 & 18.0 & y \\
+        State 2 ($G_{11}$) & 6.6  & 6.6  & 86.0 & z \\
+        State 3 ($G_{22}$) & 2.0  & 2.0  & 86.0 & w \\
+        \bottomrule
+    \end{tblr}
+    \label{tab:freq_perf_comparison}
+\end{table}
+
+Table \ref{tab:freq_perf_comparison} compares the overshoot and rise time of the simulated Simulink model against the measured physical system. Overall, the physical implementation exhibited less overshoot and a noticeably longer rise time. This difference 
+primarily occurs because the plant transfer function approximates a non-linear thermodynamic process as a perfectly linear system. Unmodeled environmental variables, such as ambient laboratory temperature shifts or constant convective cooling from air conditioning 
+drafts, act as continuous thermal disturbances. Because real-world heat loss is exponential rather than linear, the physical environment drains heat much faster than the linear model predicts. This acts as physical damping that slows the rise time and suppresses the expected overshoot.
+
+However, as seen in Figure \ref{results_root_inputs} and Figure \ref{RootSimControl}, the measured steady-state control action sits at a lower average voltage than the simulation predicted. This indicates that the physical system is more efficient at maintaining its temperature once settled. This discrepancy is likely due to the linear model underestimating the plant's true DC gain during system identification, or a warmer ambient 
+laboratory temperature during testing, which reduces the total electrical power required to hold a specific setpoint compared to the model's baseline assumption.
+
+
 
 % TODO (Nelis): 1.6 Discussion of simulated results - Comparison in terms of controller performance and aggressiveness
 % TODO (Nelis): 1.7 Discussion of simulated results - Comparison to expected behaviour from calculated values
