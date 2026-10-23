@@ -27,35 +27,10 @@ laboratory temperature during testing, which reduces the total electrical power 
 
 
 
-\subsection{Controller Design}
-
-Both design methods — root locus and frequency response — were applied to the decoupled diagonal transfer functions $G_{11}$ and $G_{22}$. All four controllers were designed to meet the same set of specifications: $10\%$ overshoot, a threefold reduction in rise time relative to the open-loop plant, and zero steady-state error for a step input. The zero steady-state error requirement was met in all designs by including an integrator ($1/s$) in the PID controller structure, which increases the system type by one and guarantees zero steady-state error for a constant reference input.
-
-The frequency response and root locus methods arrived at similar controller structures, both using the ideal PID form $G_c(s) = K_c(s+z_1)(s+z_2)/s$, with $z_2 = 0.1$ serving as the PI zero and $z_1$ placed to supply the required phase lead. The key design difference between the two methods is how $z_1$ is determined: the frequency response method calculates $z_1$ from a phase budget at the phase margin frequency $\omega_s = 0.8\omega_{BW}$, while the root locus method places $z_1$ to satisfy the angle condition at the desired closed-loop pole location $s_d$. Both approaches produced comparable gains for the same plant, confirming the internal consistency of the two design philosophies.
-
-The overshoot specification of $10\%$ was not met exactly by either method. The frequency response controllers for both $G_{11}$ and $G_{22}$ produced simulated overshoots of approximately $17\%$, and the root locus controllers produced overshoots of approximately $14\%$ and $13\%$ respectively. This is a documented limitation of the design procedures: both methods use second-order approximations to relate damping ratio and phase margin to overshoot, and the actual closed-loop systems are higher order due to the PID zeros. The derivative zeros in the numerator add phase lead but also increase the effective overshoot beyond what the second-order formula predicts. The rise time specification was exceeded comfortably by all controllers, with reductions of $3.4\times$ or greater achieved across all four designs.
-
-\subsection{Simulation Results}
-
-The simulated step responses demonstrated that all four controllers successfully achieved the target objectives in terms of rise time reduction and zero steady-state error. The Padé approximation used to represent the dead time ($\theta = 0.145$ s) introduced a right-half-plane zero into the loop transfer function, which caused the characteristic initial undershoot visible in the normalised step response plots for both $G_{11}$ and $G_{22}$. This non-minimum-phase behaviour is a consequence of the dead time and is accurately captured by the first-order Padé approximation.
-
-Comparing the two design methods in simulation, the root locus controllers exhibited slightly lower overshoot than the frequency response controllers for both $G_{11}$ and $G_{22}$. This is because the root locus method places the closed-loop poles more precisely at the desired location $s_d$, while the frequency response method only guarantees the correct phase margin at $\omega_s$, with the closed-loop bandwidth being an approximation. In both cases the settling times are long relative to the rise times, which is consistent with the thermal nature of the plant — the integrator accumulates error slowly and the thermal time constant ($\tau \approx 166$--$200$ s) dominates the settling behaviour.
-
-\subsection{Physical Implementation Results}
-
-The physical results shown in Figures \ref{fig:results_root_temps}--\ref{fig:results_freq_inputs} confirm that both sets of controllers were successfully implemented on the ESP32 microcontroller and operated correctly across all three reference states. The system cycled through State 1 (35°C/35°C), State 2 (60°C/35°C) and State 3 (60°C/50°C) as required by the demonstration procedure.
-
-Several differences between the simulated and measured responses are evident. The measured responses exhibit significantly more noise than the simulations due to the $\pm 4$°C accuracy of the MCP9700 temperature sensors and the finite resolution of the ESP32 ADC. The 200-sample running average filter reduces this noise but cannot eliminate it entirely, resulting in the jagged appearance of the measured temperature curves. The measured rise times are broadly consistent with the simulated predictions, confirming that the controller designs transferred to the physical system effectively.
-
-The most notable physical behaviour occurs during State 2, where T1 steps from 35°C to 60°C while T2 is held at 35°C. This state exercises the disturbance rejection capability of the controllers. The thermal coupling via $G_{21}$ — heat conducted from transistor 1 through the shared heatsink to temperature sensor 2 — causes T2 to deviate upward from its setpoint. The controller responds by reducing PWM2, and T2 gradually returns to 35°C. This disturbance rejection behaviour is visible in both the root locus (Figure \ref{fig:results_root_temps}) and frequency response (Figure \ref{fig:results_freq_temps}) results, validating the MIMO decoupled design approach. The decoupled design assumption — that $G_{12}$ and $G_{21}$ could be ignored during controller design — is therefore justified, as the diagonal controllers are sufficient to reject the off-diagonal coupling as a disturbance.
-
-\subsection{Comparison of Root Locus and Frequency Response Controllers}
-
-Comparing the two pairs of controllers in the physical results, both performed similarly in terms of reference tracking and disturbance rejection. The frequency response controllers, which were demonstrated as required by the practical guide, show comparable transient performance to the root locus controllers. The slight difference in gains between the two methods (for example, $K_d = 1.174$ versus $K_d = 1.179$ for the $G_{22}$ controllers) produces no practically significant difference in physical behaviour, as both sets of gains are well within the bandwidth of the physical system.
-
-The PWM input plots confirm that the control signals remained within the physical operating range of 0--3.3 V throughout the experiment, with saturation occurring briefly during step transitions as the controller drives maximum heat output to achieve the new setpoint rapidly. The anti-windup logic implemented in the firmware prevents integrator windup during these saturation periods, ensuring a clean recovery once the temperature approaches the new setpoint.
-
-Overall, the practical demonstrates that PID controllers designed using either frequency response or root locus techniques, applied to the decoupled diagonal of a MIMO thermal system, can achieve the specified transient response objectives and provide adequate disturbance rejection for the coupled physical plant.
+% TODO (Nelis): 1.6 Discussion of simulated results - Comparison in terms of controller performance and aggressiveness
+% TODO (Nelis): 1.7 Discussion of simulated results - Comparison to expected behaviour from calculated values
+% TODO (Nelis): 2.3 Discussion of results - Comparison of performance
+% TODO (Nelis): 2.4 Discussion of results - Comparison to simulation
 
 \subsection{Comparison of PID Coefficients Between Design Methods}
 
