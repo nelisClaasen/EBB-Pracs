@@ -51,9 +51,9 @@ The following Simulink model was used to simulate all controllers with the distu
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{Images/disturbance.pdf}
+    \includegraphics[width=\textwidth]{Images/G11Simulink.pdf}
     \caption{Simulink Model for Disturbance Simulations}
-\end{figure}
+\end{figure} 
 
 For all Simulink models, the PID controller was emulated using the Matlab function blocks, where the code in said blocks mimics the PID implementation done on the MCU. The block preceding the Matlab function block, called the Memory block, prevents the system from immediately trying to use the system output from the current step in the feedback loop.
 
@@ -146,14 +146,13 @@ The following table compares the step response information of the closed-loop an
         Peak Time (s) & 963.45 & 176.04 \\ 
         \bottomrule
     \end{tblr}
+    \label{tab:G11_Open_Close}
 \end{table}
 
+From table \ref{tab:G11_Open_Close} the exact rise time reduction can be calculated as $3.39\times$, this meets the specification of a $3\times$ reduction. The overshoot
+however is 7.26\% above the targeted overshoot.
 
 
-
-\vspace{0.5cm}
-\hrule
-\vspace{0.5cm}
 
 \subsection{PID Controller Design for \texorpdfstring{$G_{22}(s)$}{G22(s)} Using the Frequency Design Techniques}
 
