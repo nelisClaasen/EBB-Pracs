@@ -127,7 +127,6 @@ xline(600, 'k--', 'LineWidth', 2);
 xline(1200, 'k--', 'LineWidth', 2);
 
 hold off;
-5
 title(''); 
 xlabel('Time (seconds)');
 ylabel('Temperature (^\circ C)')
@@ -175,6 +174,10 @@ stats_t1_s2 = stepinfo(y_t1_s2, t_t1_s2, y_t1_s2(end), 'InitialValue', y_t1_s2(1
 
 fprintf('State 2 (600-1200s) Overshoot: %.2f%%\n', stats_t1_s2.Overshoot);
 fprintf('State 2 (600-1200s) Rise Time: %.2f seconds\n\n', stats_t1_s2.RiseTime);
+
+
+
+
 
 % --- Temp 2: State 1 (0 to 600 seconds) ---
 idx_t2_s1 = (t >= 0) & (t < 600);
