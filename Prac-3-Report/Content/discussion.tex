@@ -51,6 +51,12 @@ laboratory temperature during testing, which reduces the total electrical power 
     \label{tab:root_perf_comparison}
 \end{table}
 
+Table \ref{tab:root_perf_comparison} compares the overshoots and rise times of the measured physical system (plotted in figure \ref{fig:results_root_temps}) to those of the simulated Simulink model. (figure \ref{fig:RootsimTemp}) It is evident that the plant $G_{11}$ had an overshoot and rise time larger than the simulation during state 1, while in the transition to state 2, it had a slightly faster rise time and a slightly lower overshoot.
+
+The plant $G_{22}$ had significantly higher rise times than the simulation for all the state transitions, while having a slightly better overshoot in the transition to state 1, and a slightly worse overshoot in the transition to state 3. Overall for both systems the simulation performed better in all the design criteria, showing a more aggressive and fast approach to the setpoint than the physical systems.
+
+Factors that can explain these differences are the same as those mentioned during the discussion of the frequency response technique results. External factors like laboratory temperature shifts, cooling drafts, and the inaccuracies due to estimating non-linear thermal cooling and heating as a linear system.
+
 \subsection{Comparison of PID Coefficients Between Design Methods}
 
 Table \ref{tab:pid_comparison} summarises the PID coefficients obtained for $G_{11}$ and $G_{22}$ using both design methods.

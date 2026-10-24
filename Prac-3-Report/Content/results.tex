@@ -1,16 +1,95 @@
 \section{Results}
 \subsection{Root Locus Designs}
+The plots below show the measured experiment data for both controlled systems $G_{11}$ and $G_{22}$ when the controllers were designed using root locus techniques. Furthermore, the simulated results from the Simulink model are shown.
+
 \PlotPicture{Results/PID_Root_Temps.pdf}{Measured Temperature results for the root locus designed controllers, with state transitions shown using dotted vertical lines}{fig:results_root_temps}
 
+Performing manual measurements on the manual data resulted in the estimated overshoot and rise time values for each state transition shown in the table below:
+
+\begin{table}[H]
+    \centering
+    \caption{Measured rise times and overshoots for each state transition for the root locus designed system}
+    \begin{tblr}{colspec={X|XX}, row{1}={font=\bfseries}, row{even}={bg=gray!20}}
+        \toprule
+        State Transition & Overshoot (\%) & Rise Time (s) \\
+        \midrule
+        State 1 ($G_{11}$) & 20.29 & 18.17 \\
+        State 1 ($G_{22}$) & 10.15 & 37.59 \\
+        State 2 ($G_{11}$) & 3.33  & 90.05 \\
+        State 3 ($G_{22}$) & 2.0   & 37.00 \\
+        \bottomrule
+    \end{tblr}
+    \label{tab:root_measured_chars}
+\end{table}
+
 \PlotPicture{RootSimTemp.pdf}{Measured simulated temperature results for the root locus designed controllers, with state transitions shown using dotted vertical lines}{fig:RootsimTemp}
+
+Similarly, manual graphical measurements were made for the simulated results, with the table below showing the overshoots and rise times associated with each state transition.
+
+\begin{table}[H]
+    \centering
+    \caption{Simulated rise times and overshoots for each state transition for the root locus designed system}
+    \begin{tblr}{colspec={X|XX}, row{1}={font=\bfseries}, row{even}={bg=gray!20}}
+        \toprule
+        State Transition & Overshoot (\%) & Rise Time (s) \\
+        \midrule
+        State 1 ($G_{11}$) & 16.90 & 14.56 \\
+        State 1 ($G_{22}$) & 10.35 & 19.59 \\
+        State 2 ($G_{11}$) & 3.40  & 95.08 \\
+        State 3 ($G_{22}$) & 0.90  & 19.72 \\
+        \bottomrule
+    \end{tblr}
+    \label{tab:root_simulated_chars}
+\end{table}
 
 \PlotPicture{Results/PID_Root_Inputs.pdf}{Measured control input results for the root locus designed controllers, with state transitions shown using dotted vertical lines}{fig:results_root_inputs}
 
 \PlotPicture{RootSimControl.pdf}{Measured simulated control input results for the root locus designed controllers, with state transitions shown using dotted vertical lines}{fig:RootsimControl}
 
+\newpage
+
+\subsection{Frequency Response Designs}
+The plots below show the measured experiment data for both controlled systems $G_{11}$ and $G_{22}$ when the controllers were designed using frequency response techniques. Furthermore, the simulated results from the Simulink model are shown.
+
 \PlotPicture{Results/PID_Freq_Temps.pdf}{Measured Temperature results for the frequency response designed controllers, with state transitions shown using dotted vertical lines}{fig:results_freq_temps}
 
+Performing manual measurements on the manual data resulted in the estimated overshoot and rise time values for each state transition shown in the table below:
+
+\begin{table}[H]
+    \centering
+    \caption{Measured rise times and overshoots for each state transition for the frequency response designed system}
+    \begin{tblr}{colspec={X|XX}, row{1}={font=\bfseries}, row{even}={bg=gray!20}}
+        \toprule
+        State Transition & Overshoot (\%) & Rise Time (s) \\
+        \midrule
+        State 1 ($G_{11}$) & 21.14 & 22.18 \\
+        State 1 ($G_{22}$) & 10.43 & 43.85 \\
+        State 2 ($G_{11}$) & 6.17  & 82 \\
+        State 3 ($G_{22}$) & 1.68  & 37.63 \\
+        \bottomrule
+    \end{tblr}
+    \label{tab:freq_measured_chars}
+\end{table}
+
 \PlotPicture{FreqSimTemp.pdf}{Measured simulated temperature results for the frequency response designed controllers, with state transitions shown using dotted vertical lines}{fig:FreqsimTemp}
+
+Again, the table below shows the response characteristics measured from the simulated results.
+
+\begin{table}[H]
+    \centering
+    \caption{Simulated rise times and overshoots for each state transition for the frequency response designed system}
+    \begin{tblr}{colspec={X|XX}, row{1}={font=\bfseries}, row{even}={bg=gray!20}}
+        \toprule
+        State Transition & Overshoot (\%) & Rise Time (s) \\
+        \midrule
+        State 1 ($G_{11}$) & 23.54 & 13.91 \\
+        State 1 ($G_{22}$) & 16.09 & 18.27 \\
+        State 2 ($G_{11}$) & 5.78  & 88.89 \\
+        State 3 ($G_{22}$) & 0.95  & 18.63 \\
+        \bottomrule
+    \end{tblr}
+    \label{tab:root_simulated_chars}
+\end{table}
 
 \PlotPicture{FreqSimControlAction.pdf}{Measured simulated control input results for the frequency response designed controllers, with state transitions shown using dotted vertical lines}{fig:FreqsimControlAction}
 
