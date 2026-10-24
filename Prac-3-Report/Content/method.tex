@@ -39,6 +39,25 @@ The following table contains the derived transfer functions that were used to si
 
 \end{table}
 
+The following Simulink model was used for both $G_{11}$ and $G_{22}$ reference tracking controller design.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/G11_Simulink.pdf}
+    \caption{Simulink Model for Reference Tracking Simulations}
+\end{figure}
+
+The following Simulink model was used to simulate all controllers with the disturbance from the full Multiple Input, Multiple Output (MIMO) system.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/disturbance.pdf}
+    \caption{Simulink Model for Disturbance Simulations}
+\end{figure}
+
+For all Simulink models, the PID controller was emulated using the Matlab function blocks, where the code in said blocks mimics the PID implementation done on the MCU. The block preceding the Matlab function block, called the Memory block, prevents the system from immediately trying to use the system output from the current step in the feedback loop.
+
+
 \subsection{PID Controller Design for \texorpdfstring{$G_{11}(s)$}{G11(s)} Using the Frequency Design Techniques}
 
 The design specifications are a $10\%$ overshoot and a rise time of $T_r = 96.1$ s. The damping ratio $\zeta$ is calculated as:
