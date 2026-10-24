@@ -33,8 +33,8 @@ hold on; grid on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Plot the actual temperature output.
 %Plot both temeratures.
-t1 = plot(time, dataY(:, 1), LineWidth=1.5);
-t2 = plot(time, dataY(:, 2), LineWidth=1.5);
+t1 = plot(time, dataY(:, 1), LineWidth=2);
+t2 = plot(time, dataY(:, 2), LineWidth=2);
 title(figNameTemp);
 legend([t1, t2], {'Temperature Measurement 1', 'Temperature Measurement 2'}, 'Location','southeast', FontSize=14);
 ylabel('Temperature (°C)');
@@ -58,8 +58,8 @@ hold on; grid on;
 
 % Plot the PWM input signal.
 ylim([-0.1, 3.5])
-plot(time, movmean(PWM_Input(:, 1), 500), LineWidth=1.5);
-plot(time, movmean(PWM_Input(:, 2), 500), LineWidth=1.5);
+plot(time, movmean(PWM_Input(:, 1), 500), LineWidth=2);
+plot(time, movmean(PWM_Input(:, 2), 500), LineWidth=2);
 title(figNamePWM)
 legend('PWM Input 1', 'PWM Input 2', 'Location','best', FontSize=14);
 xlabel('Time (s)');
