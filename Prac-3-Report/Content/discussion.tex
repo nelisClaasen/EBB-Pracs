@@ -9,10 +9,10 @@
         \cmidrule[lr]{2-3} \cmidrule[lr]{4-5}
         State Transition & Simulated & Measured & Simulated & Measured \\
         \midrule
-        State 1 ($G_{11}$) & 23.54 & 21.0 & 41.10 & x \\
-        State 1 ($G_{22}$) & 16.09 & 11.4 & 43.22 & y \\
-        State 2 ($G_{11}$) & 5.78  & 6.6  & 77.14 & z \\
-        State 3 ($G_{22}$) & 0.95  & 2.0  & 0.00  & w \\
+        State 1 ($G_{11}$) & 23.54 & 21.14 & 41.10 & 22.18 \\
+        State 1 ($G_{22}$) & 16.09 & 10.43 & 43.22 & 43.85 \\
+        State 2 ($G_{11}$) & 5.78  & 6.17  & 77.14 & 82 \\
+        State 3 ($G_{22}$) & 0.95  & 1.68  & 0.00  & 37.63 \\
         \bottomrule
     \end{tblr}
     \label{tab:freq_perf_comparison}
@@ -31,6 +31,25 @@ laboratory temperature during testing, which reduces the total electrical power 
 % TODO (Nelis): 1.7 Discussion of simulated results - Comparison to expected behaviour from calculated values
 % TODO (Nelis): 2.3 Discussion of results - Comparison of performance
 % TODO (Nelis): 2.4 Discussion of results - Comparison to simulation
+
+\subsection{Root Locus Technique}
+\begin{table}[H]
+    \centering
+    \caption{Comparison of Simulated vs. Measured Transient Performance for Root Locus PID Controllers}
+    \begin{tblr}{colspec={X|XX|XX}, row{1,2}={font=\bfseries}, row{even}={bg=gray!20}}
+        \toprule
+        & \SetCell[c=2]{c} Overshoot (\%) & & \SetCell[c=2]{c} Rise Time (s) & \\
+        \cmidrule[lr]{2-3} \cmidrule[lr]{4-5}
+        State Transition & Simulated & Measured & Simulated & Measured \\
+        \midrule
+        State 1 ($G_{11}$) & 16.90 & 20.29 & 40.65 & 18.17 \\
+        State 1 ($G_{22}$) & 10.35 & 10.15 & 43.21 & 37.59 \\
+        State 2 ($G_{11}$) & 3.40  & 3.33  & 77.08 & 90.05 \\
+        State 3 ($G_{22}$) & 0.90  & 2.0  & 0.00  & 37.00 \\
+        \bottomrule
+    \end{tblr}
+    \label{tab:root_perf_comparison}
+\end{table}
 
 \subsection{Comparison of PID Coefficients Between Design Methods}
 
